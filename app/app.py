@@ -233,7 +233,7 @@ def filtroByCodigo(dataFrame, codigo):
     contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
 
     # Renomear as colunas do DataFrame resultante
-    contagem_ocorrencias.columns = ['Beneficiário', 'Quantidade de Ocorrências']
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
 
     # Exibir o DataFrame resultante
     # print(contagem_ocorrencias)
