@@ -223,9 +223,7 @@ def filtroAllCodigo(dataFrame, lista_diferentes_codigos):
     return df_result
 
 def filtroByCodigo(dataFrame, codigo):
-    import pandas as pd
-
-    # Supondo que o DataFrame se chama df e a coluna de código é 'Código' e a coluna de beneficiário é 'Beneficiário'
+    
     # Selecione apenas as linhas com o código "5000510"
     df_codigo = dataFrame[dataFrame['Código'] == codigo]
 
@@ -237,6 +235,26 @@ def filtroByCodigo(dataFrame, codigo):
 
     # Exibir o DataFrame resultante
     # print(contagem_ocorrencias)
+
+
+    # Criando a nova coluna "valor" e atribuindo o valor de 50,00 em todas as linhas
+    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+
+    # Criando as novas colunas "Parceiro 1 - 60%" e "Valor - 40%" com os valores calculados
+    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Quantas vezes Passou'] * contagem_ocorrencias['Valor Por Atendimento'] * 0.6
+    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Quantas vezes Passou'] * contagem_ocorrencias['Valor Por Atendimento'] * 0.4
+
+    # Formatar as colunas para o formato de moeda (real brasileiro)
+    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+
+
+
+
+    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
 
     return contagem_ocorrencias
 
@@ -265,7 +283,7 @@ def index():
             df_exibir = filtroByCodigo(df,codigo="5000510")
 
             # Convert the DataFrame to an HTML table
-            df_html = df_exibir.to_html(classes='table table-bordered table-striped')
+            df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
             return jsonify(df_html)
 
     return render_template('index.html')

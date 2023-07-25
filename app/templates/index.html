@@ -40,10 +40,18 @@
                             <div class="center-align mt-3">
                                 <button class="btn waves-effect waves-light" id="upload-another">Alterar Arquivo</button>
                             </div>
+                            <div class="input-field">
+                                <select id="filter-beneficiary" multiple>
+                                    <option value="" selected disabled>Selecione um Beneficiário</option>
+                                </select>
+                                <label for="filter-beneficiary">Filtrar por Beneficiário</label>
+                            </div>
+                            <div class="center-align mt-2">
+                                <button class="btn waves-effect waves-light" id="clear-selection">Remover Seleção</button>
+                            </div>
                             <div class="table-responsive">
                                 <div class="card">
                                     <div class="card-content">
-                                        <!-- <span class="card-title center-align">Dados</span> -->
                                         <div class="table-container" id="result-table">
                                             <!-- Result table will be displayed here -->
                                         </div>
@@ -77,6 +85,9 @@
                         $("#form-section").hide();
                         $("#result-table").html(response);
                         $("#result-section").show();
+
+                        // Populate the filter select with beneficiaries from the table
+                        populateBeneficiaryFilter();
                     },
                     error: function (xhr, status, error) {
                         console.log("Error:", error);
@@ -88,7 +99,100 @@
                 $("#result-section").hide();
                 $("#form-section").show();
             });
+
+            $("#clear-selection").click(function () {
+                $("#filter-beneficiary").val(null);
+                $("#filter-beneficiary").formSelect();
+                filterTableByBeneficiary([]);
+            });
         });
+
+        // Function to populate the filter select with beneficiaries
+        function populateBeneficiaryFilter() {
+            let beneficiaries = [];
+            $("#result-table tbody tr").each(function () {
+                beneficiaries.push($(this).find("td:nth-child(1)").text());
+            });
+
+            beneficiaries = [...new Set(beneficiaries)];
+
+            // Clear existing options
+            $("#filter-beneficiary").empty();
+
+            // Add new options
+            $("#filter-beneficiary").append("<option value='' selected disabled>Selecione um Beneficiário</option>");
+            beneficiaries.forEach(function (beneficiary) {
+                $("#filter-beneficiary").append(`<option value="${beneficiary}">${beneficiary}</option>`);
+            });
+            
+            // Initialize the Materialize multiselect element
+            $("#filter-beneficiary").formSelect();
+
+            // Add event listener to filter by beneficiary
+            $("#filter-beneficiary").change(function () {
+                let selectedBeneficiaries = $(this).val();
+                filterTableByBeneficiary(selectedBeneficiaries);
+            });
+        }
+
+        // Function to filter the table by beneficiary
+        function filterTableByBeneficiary(selectedBeneficiaries) {
+            $("#result-table tbody tr").each(function () {
+                let rowBeneficiary = $(this).find("td:nth-child(1)").text();
+                if (selectedBeneficiaries.length === 0 || selectedBeneficiaries.includes(rowBeneficiary)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            // Calculate and display the totals row
+            calculateAndDisplayTotals();
+        }
+
+
+        // Function to format the value as Brazilian currency (Real)
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // Function to calculate and display the totals row
+        function calculateAndDisplayTotals() {
+            let totalQuantasVezesPassou = 0;
+            let totalValorPorAtendimento = 0;
+            let totalParceiro1 = 0;
+            let totalParceiro2 = 0;
+
+            $("#result-table tbody tr:visible").each(function () {
+                let quantasVezesPassou = parseFloat($(this).find("td:nth-child(2)").text());
+                let valorPorAtendimento = parseFloat($(this).find("td:nth-child(3)").text().replace("R$", "").replace(",", "."));
+
+                totalQuantasVezesPassou += quantasVezesPassou;
+                totalValorPorAtendimento += valorPorAtendimento;
+                totalParceiro1 += quantasVezesPassou * valorPorAtendimento * 0.6; // 60% for Parceiro 1
+                totalParceiro2 += quantasVezesPassou * valorPorAtendimento * 0.4; // 40% for Parceiro 2
+            });
+
+            // Format the values as Brazilian currency
+            let formattedTotalValorPorAtendimento = formatCurrency(totalValorPorAtendimento);
+            let formattedTotalParceiro1 = formatCurrency(totalParceiro1);
+            let formattedTotalParceiro2 = formatCurrency(totalParceiro2);
+            
+            
+            // Create the totals row
+            let totalsRow = `
+                <tr>
+                    <td><b>Total</b></td>
+                    <td><b>${totalQuantasVezesPassou}</b></td>
+                    <td></td>
+                    <td><b>${formattedTotalParceiro1}</b></td>
+                    <td><b>${formattedTotalParceiro2}</b></td>
+                </tr>
+            `;
+
+            // Append the totals row to the table
+            $("#result-table tbody").append(totalsRow);
+        }
     </script>
 </body>
 </html>
