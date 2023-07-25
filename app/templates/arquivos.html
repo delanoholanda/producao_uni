@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pdf to CSV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f1f1f1;
+        }
+
+        .card-panel {
+            margin-top: 50px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            background-color: #2196f3;
+        }
+
+        .file-list {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card-panel grey lighten-4">
+            <h4 class="center-align">Pdf to CSV</h4>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <div class="file-field input-field">
+                    <div class="btn waves-effect waves-light blue darken-1">
+                        <span>Escolher arquivos</span>
+                        <input type="file" name="pdf_files" multiple>
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text" placeholder="Envie um ou mais arquivos PDF">
+
+                    </div>
+                </div>
+                <div class="center-align">
+                    <button class="btn waves-effect waves-light blue darken-1 center-align" type="submit"
+                        name="action">Enviar</button>
+                </div>
+            </form>
+            <div class="progress" style="display:none">
+                <div class="indeterminate"></div>
+              </div>
+        </div>
+        {% if file_paths %}
+        <div class="card-panel grey lighten-4 file-list">
+            <h5>Arquivos enviados:</h5>
+            <ul>
+                {% for file_path in file_paths %}
+                <li><a href="{{ url_for('download', filename=file_path.split('/')[-1]) }}">{{ file_path.split('/')[-1]
+                        }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelector('.progress').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html >

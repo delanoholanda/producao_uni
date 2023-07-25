@@ -1,0 +1,87 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF File Upload</title>
+    <!-- Link Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Link jQuery (required for AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Link Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col s12 m8 offset-m2">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title center-align">PDF File Upload</span>
+                        <div id="form-section">
+                            <form id="upload-form" enctype="multipart/form-data">
+                                <div class="file-field input-field">
+                                    <div class="btn">
+                                        <span>Escolher Arquivo</span>
+                                        <input type="file" name="file" accept=".pdf">
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input class="file-path validate" type="text">
+                                    </div>
+                                </div>
+                                <div class="center-align">
+                                    <button class="btn waves-effect waves-light" type="submit" name="action">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="result-section" style="display: none;">
+                            <div class="center-align mt-3">
+                                <button class="btn waves-effect waves-light" id="upload-another">Alterar Arquivo</button>
+                            </div>
+                            <div class="table-responsive">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <!-- <span class="card-title center-align">Dados</span> -->
+                                        <div class="table-container" id="result-table">
+                                            <!-- Result table will be displayed here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script>
+        $(document).ready(function () {
+            $("#upload-form").submit(function (event) {
+                event.preventDefault();
+                let formData = new FormData(this);
+                $.ajax({
+                    url: "/",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $("#form-section").hide();
+                        $("#result-table").html(response);
+                        $("#result-section").show();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Error:", error);
+                    }
+                });
+            });
+
+            $("#upload-another").click(function () {
+                $("#result-section").hide();
+                $("#form-section").show();
+            });
+        });
+    </script>
+</body>
+</html>
