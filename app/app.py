@@ -9,40 +9,6 @@ import PyPDF2
 
 app = Flask(__name__)
 
-
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and file.filename.endswith('.pdf'):
-            # Create a temporary file to store the uploaded PDF data
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file_path = temp_file.name
-                file.save(temp_file_path)
-
-            texto_extraido = extrairTextoPdf(temp_file_path)
-            lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
-            texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
-            df = montarDataFrame(lista_diferentes_codigos, texto_processado)
-
-            # Remove the temporary file after processing
-            os.remove(temp_file_path)
-
-            df_exibir = filtroByCodigo(df, lista_diferentes_codigos)
-
-            # Convert the DataFrame to an HTML table
-            df_html = df_exibir.to_html(classes='table table-bordered table-striped')
-            return jsonify(df_html)
-
-    return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-
 def extrairTextoPdf(caminho_arquivo):
     with open(caminho_arquivo, 'rb') as arquivo:
         leitor_pdf = PyPDF2.PdfReader(arquivo)
@@ -225,7 +191,7 @@ def montarDataFrame(lista_diferentes_codigos, texto_processado):
     df = pd.DataFrame(dados)
     return df
 
-def filtroByCodigo(dataFrame, lista_diferentes_codigos):
+def filtroAllCodigo(dataFrame, lista_diferentes_codigos):
     # Filtrar o DataFrame com base na lista de códigos
     df_filtered = dataFrame[dataFrame['Código'].isin(lista_diferentes_codigos)]
 
@@ -256,75 +222,57 @@ def filtroByCodigo(dataFrame, lista_diferentes_codigos):
     # print(df_result)
     return df_result
 
+def filtroByCodigo(dataFrame, codigo):
+    import pandas as pd
 
-# # Extraia o texto do PDF
-# caminho_arquivo_pdf = './producao_uni/app/Dados/producao.pdf'
-# texto_extraido = extrairTextoPdf(caminho_arquivo_pdf)
+    # Supondo que o DataFrame se chama df e a coluna de código é 'Código' e a coluna de beneficiário é 'Beneficiário'
+    # Selecione apenas as linhas com o código "5000510"
+    df_codigo = dataFrame[dataFrame['Código'] == codigo]
 
-# lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
+    # Contar a quantidade de ocorrências de cada beneficiário para o código "5000510"
+    contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
 
+    # Renomear as colunas do DataFrame resultante
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantidade de Ocorrências']
 
-# texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
-# # print(texto_processado)
+    # Exibir o DataFrame resultante
+    # print(contagem_ocorrencias)
 
-# df = montarDataFrame(lista_diferentes_codigos, texto_processado)
-
-# # print(df)
-
-# #### FIM da montagem do DataFrame
-
-# # Exibir o DataFrame
-# # pd.set_option('display.max_columns', None)
-# # pd.set_option('display.expand_frame_repr', False)
+    return contagem_ocorrencias
 
 
-# # ######### INICIO Conta quantas vezes cada um passou  #############
-# # print("Com o filtro!!!!!!!!!!!!!")
 
-# # # Filter the DataFrame for rows with the code "5000510"
-# # df_filtered = df[df['Código'] == '5000510']
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and file.filename.endswith('.pdf'):
+            # Create a temporary file to store the uploaded PDF data
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file_path = temp_file.name
+                file.save(temp_file_path)
 
-# # # Contar a ocorrência de cada beneficiário
-# # contagem_beneficiario = df_filtered['Beneficiário'].value_counts()
+            texto_extraido = extrairTextoPdf(temp_file_path)
+            lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
+            texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
+            df = montarDataFrame(lista_diferentes_codigos, texto_processado)
 
-# # print(contagem_beneficiario.to_string())
+            # Remove the temporary file after processing
+            os.remove(temp_file_path)
 
-# # ######### FIM Conta quantas vezes cada um passou  #############
+            # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
 
-# # print("")
-# # print("")
-# # print("Sem o filtro!!!!!!!!!!!!!")
-# # contagem_beneficiario2 = df['Beneficiário'].value_counts()
+            df_exibir = filtroByCodigo(df,codigo="5000510")
 
-# # print(contagem_beneficiario2.to_string())
-# # # display(df.head(50))
+            # Convert the DataFrame to an HTML table
+            df_html = df_exibir.to_html(classes='table table-bordered table-striped')
+            return jsonify(df_html)
 
+    return render_template('index.html')
 
-# # Filtrar o DataFrame com base na lista de códigos
-# df_filtered = df[df['Código'].isin(lista_diferentes_codigos)]
-
-# # Obter a lista única de beneficiários do DataFrame filtrado
-# beneficiarios_unicos = df_filtered['Beneficiário'].unique()
-
-# # Criar um novo DataFrame para armazenar os resultados
-# df_result = pd.DataFrame(columns=['Beneficiário'] + lista_diferentes_codigos)
-
-# # Preencher o novo DataFrame com os resultados
-# for beneficiario in beneficiarios_unicos:
-#     row_data = {'Beneficiário': beneficiario}
-#     for codigo in lista_diferentes_codigos:
-#         row_data[codigo] = len(df_filtered[(df_filtered['Beneficiário'] == beneficiario) & (df_filtered['Código'] == codigo)])
-#     df_result = pd.concat([df_result, pd.DataFrame([row_data])], ignore_index=True)
-
-# # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
-# df_result = df_result.sort_values(by='Beneficiário', ignore_index=True)
-
-# # Calcular a soma de ocorrências de todos os códigos para cada beneficiário
-# df_result['Total'] = df_result[lista_diferentes_codigos].sum(axis=1)
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
-# # Arredondar a soma de ocorrências para remover a casa decimal
-# df_result['Total'] = df_result['Total'].astype(int)
-    
-# # Exibir o novo DataFrame
-# print(df_result)
+
+
