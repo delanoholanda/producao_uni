@@ -9,6 +9,11 @@ import PyPDF2
 
 app = Flask(__name__)
 
+TEXTO_EXTRAIDO = ""
+CODIGOS_DIFERENTES = ""
+LOTES_DIFERENTES = ""
+DATAFRAME_ORIGINAL = None
+
 def extrairTextoPdf(caminho_arquivo):
     with open(caminho_arquivo, 'rb') as arquivo:
         leitor_pdf = PyPDF2.PdfReader(arquivo)
@@ -189,6 +194,9 @@ def montarDataFrame(lista_diferentes_codigos, texto_processado):
 
     # Criar o DataFrame
     df = pd.DataFrame(dados)
+    # Limpar espaços em branco no final dos valores da coluna "Beneficiário"
+    df['Beneficiário'] = df['Beneficiário'].str.strip()
+    
     return df
 
 def filtroAllCodigo(dataFrame, lista_diferentes_codigos):
@@ -258,10 +266,142 @@ def filtroByCodigo(dataFrame, codigo):
 
     return contagem_ocorrencias
 
+def filtroByCodigo2(dataFrame, codigo):
+
+    # Lista de beneficiários específicos
+    beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
+
+    # Selecione apenas as linhas com o código "5000510"
+    df_codigo = dataFrame[dataFrame['Código'] == codigo]
+    
+    # Contar a quantidade de ocorrências de cada beneficiário para o código "5000510"
+    contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
+
+    # Renomear as colunas do DataFrame resultante
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
+
+
+    
+
+    # print(contagem_ocorrencias)
+
+    #     # Verificando se os beneficiários estão no DataFrame
+    # for beneficiario in beneficiarios_especificos:
+    #     if beneficiario in contagem_ocorrencias["Beneficiário"].values:
+    #         print(f"{beneficiario} está presente no DataFrame.")
+    #     else:
+    #         print(f"{beneficiario} não está presente no DataFrame.")
+
+    # Criando a nova coluna "Valor Por Atendimento" e atribuindo o valor de 50,00 em todas as linhas
+    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+
+    
+    # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
+    def calcular_valores(row):
+        if row['Beneficiário'] in beneficiarios_especificos:
+            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.5
+            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+        else:
+            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.6
+            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+
+        recebido = row['Quantas vezes Passou'] * row['Valor Por Atendimento']
+        devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
+        mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
+        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Mãe Faltou': mae_faltou, 'Parceiro 1 - 60%': parceiro_1, 'Parceiro 2 - 40%': parceiro_2})
+
+    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Mãe Faltou", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
+    contagem_ocorrencias[['Recebido', 'Devido', 'Mãe Faltou', 'Parceiro 1 - 60%', 'Parceiro 2 - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+
+    # Formatar as colunas para o formato de moeda (real brasileiro)
+    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Mãe Faltou'] = contagem_ocorrencias['Mãe Faltou'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+
+
+    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
+
+    return contagem_ocorrencias
+
+
+def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
+    
+    # Lista de beneficiários específicos
+    beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
+
+    # Selecione apenas as linhas com o código "5000510"
+    df_codigo = dataFrame[dataFrame['Código'] == codigo]
+    
+    # Contar a quantidade de ocorrências de cada beneficiário para o código "5000510"
+    contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
+
+    # Renomear as colunas do DataFrame resultante
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
+
+    print(contagem_ocorrencias)
+
+    # Filtro para manter apenas as linhas cujo beneficiário está na lista de beneficiários específicos
+    filtro = contagem_ocorrencias["Beneficiário"].isin(beneficiarios_desejados)
+
+    # Aplicar o filtro ao DataFrame
+    contagem_ocorrencias = contagem_ocorrencias[filtro]
+
+    print(contagem_ocorrencias)
+    
+
+    # print(contagem_ocorrencias)
+
+    #     # Verificando se os beneficiários estão no DataFrame
+    # for beneficiario in beneficiarios_especificos:
+    #     if beneficiario in contagem_ocorrencias["Beneficiário"].values:
+    #         print(f"{beneficiario} está presente no DataFrame.")
+    #     else:
+    #         print(f"{beneficiario} não está presente no DataFrame.")
+
+    # Criando a nova coluna "Valor Por Atendimento" e atribuindo o valor de 50,00 em todas as linhas
+    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+
+    
+    # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
+    def calcular_valores(row):
+        if row['Beneficiário'] in beneficiarios_desejados:
+            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.5
+            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+        else:
+            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.6
+            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+
+        recebido = row['Quantas vezes Passou'] * row['Valor Por Atendimento']
+        devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
+        mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
+        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Mãe Faltou': mae_faltou, 'Parceiro 1 - 60%': parceiro_1, 'Parceiro 2 - 40%': parceiro_2})
+
+    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Mãe Faltou", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
+    contagem_ocorrencias[['Recebido', 'Devido', 'Mãe Faltou', 'Parceiro 1 - 60%', 'Parceiro 2 - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+
+    # Formatar as colunas para o formato de moeda (real brasileiro)
+    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Mãe Faltou'] = contagem_ocorrencias['Mãe Faltou'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+
+    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
+
+    return contagem_ocorrencias
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global DATAFRAME_ORIGINAL
     if request.method == 'POST':
         file = request.files['file']
         if file and file.filename.endswith('.pdf'):
@@ -274,19 +414,53 @@ def index():
             lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
             texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
             df = montarDataFrame(lista_diferentes_codigos, texto_processado)
+            DATAFRAME_ORIGINAL = df
 
             # Remove the temporary file after processing
             os.remove(temp_file_path)
 
             # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
 
-            df_exibir = filtroByCodigo(df,codigo="5000510")
+            df_exibir = filtroByCodigo2(df,codigo="5000510")
 
             # Convert the DataFrame to an HTML table
             df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
             return jsonify(df_html)
 
     return render_template('index.html')
+
+@app.route('/filtro-5000510', methods=['GET'])
+def filtro_codigo_5000510():
+    global DATAFRAME_ORIGINAL
+    if DATAFRAME_ORIGINAL is None:
+        return "No dataframe available."
+    df_exibir = filtroByCodigo(DATAFRAME_ORIGINAL, codigo="5000510")
+    df_html = df_exibir.to_html(classes='table table-bordered table-striped center-align', index=False)
+    return render_template('filtro_codigo.html', df_html=df_html)
+
+@app.route('/filtro-elizza', methods=['GET'])
+def filtro_elizza():
+    global DATAFRAME_ORIGINAL
+    if DATAFRAME_ORIGINAL is None:
+        return "No dataframe available."
+    print(DATAFRAME_ORIGINAL)
+    # Fazendo o filtro com base nos beneficiários desejados
+    beneficiarios_desejados = ["ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
+                                 "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ", 
+                                 "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES"]
+    
+    codigo = "5000510"
+    df_exibir = filtroByAT(DATAFRAME_ORIGINAL, beneficiarios_desejados, codigo)
+    df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+    return render_template('filtro_codigo.html', df_html=df_html)
+
+@app.route('/filtro-5000518', methods=['GET'])
+def filtro_codigo_5000518():
+    global DATAFRAME_ORIGINAL
+    df_exibir = filtroByCodigo(DATAFRAME_ORIGINAL, codigo="5000518")
+    df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+    return render_template('filtro_codigo.html', df_html=df_html)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -13,7 +13,8 @@
 <body>
     <div class="container">
         <div class="row mt-5">
-            <div class="col s12 m8 offset-m2">
+            <!-- <div class="col s12 m11 offset-m2">  troquei pela de baixo sem nada--> 
+            <div>
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title center-align">Upload do Arquivo PDF</span>
@@ -40,6 +41,18 @@
                             <div class="center-align mt-3">
                                 <button class="btn waves-effect waves-light" id="upload-another">Alterar Arquivo</button>
                             </div>
+                            <div id="filtro-buttons">
+                                <!-- <div class="center-align mt-3">
+                                    <a href="{{ url_for('filtro_codigo_5000510') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Código 5000510</a>
+                                </div>
+                                <div class="center-align mt-3">
+                                    <a href="{{ url_for('filtro_codigo_5000518') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Código 5000518</a>
+                                </div> -->
+                                <div class="center-align mt-3">
+                                    <a href="{{ url_for('filtro_elizza') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Elizza</a>
+                                </div>
+                             <!--    Adicione outros filtros conforme necessário -->
+                            </div> 
                             <div class="input-field">
                                 <select id="filter-beneficiary" multiple>
                                     <option value="" selected disabled>Selecione um Beneficiário</option>
@@ -49,16 +62,18 @@
                             <div class="center-align mt-2">
                                 <button class="btn waves-effect waves-light" id="clear-selection">Remover Seleção</button>
                             </div>
-                            <div class="table-responsive">
+                            <div >
                                 <div class="card">
                                     <div class="card-content">
                                         <div class="table-container" id="result-table">
-                                            <!-- Result table will be displayed here -->
+                                            <!-- Result table will be displayed here -->                                         
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        
                     </div>
                 </div>
             </div>
@@ -200,23 +215,35 @@
         function calculateAndDisplayTotals() {
             let totalQuantasVezesPassou = 0;
             let totalValorPorAtendimento = 0;
+            let totalRecebido = 0;
+            let totalDevido = 0;
+            let totalMae = 0;
             let totalParceiro1 = 0;
             let totalParceiro2 = 0;
 
             $("#result-table tbody tr:visible").each(function () {
                 let quantasVezesPassou = parseFloat($(this).find("td:nth-child(2)").text());
                 let valorPorAtendimento = parseFloat($(this).find("td:nth-child(3)").text().replace("R$", "").replace(",", "."));
+                let recebido = parseFloat($(this).find("td:nth-child(4)").text().replace("R$", "").replace(",", "."));
+                let devido = parseFloat($(this).find("td:nth-child(5)").text().replace("R$", "").replace(",", "."));
+                let mae = parseFloat($(this).find("td:nth-child(6)").text().replace("R$", "").replace(",", "."));
 
                 totalQuantasVezesPassou += quantasVezesPassou;
                 totalValorPorAtendimento += valorPorAtendimento;
-                totalParceiro1 += quantasVezesPassou * valorPorAtendimento * 0.6; // 60% for Parceiro 1
-                totalParceiro2 += quantasVezesPassou * valorPorAtendimento * 0.4; // 40% for Parceiro 2
+                totalParceiro1 += parseFloat($(this).find("td:nth-child(7)").text().replace("R$", "").replace(",", "."));
+                totalParceiro2 += parseFloat($(this).find("td:nth-child(8)").text().replace("R$", "").replace(",", "."));
+                // totalRecebido += recebido;
+                totalDevido += devido
+                totalMae += mae
             });
 
             // Format the values as Brazilian currency
             let formattedTotalValorPorAtendimento = formatCurrency(totalValorPorAtendimento);
             let formattedTotalParceiro1 = formatCurrency(totalParceiro1);
             let formattedTotalParceiro2 = formatCurrency(totalParceiro2);
+            // let formattedTotalRecebido = formatCurrency(totalRecebido);
+            // let formattedTotalDevido = formatCurrency(totalDevido);
+            let formattedTotalMae = formatCurrency(totalMae);
             
             
             // Create the totals row
@@ -225,6 +252,9 @@
                     <td><b>Total</b></td>
                     <td><b>${totalQuantasVezesPassou}</b></td>
                     <td></td>
+                    <td></td>
+                    <td></td>                    
+                    <td><b>${formattedTotalMae}</b></td>
                     <td><b>${formattedTotalParceiro1}</b></td>
                     <td><b>${formattedTotalParceiro2}</b></td>
                 </tr>
@@ -233,6 +263,25 @@
             // Append the totals row to the table
             $("#result-table tbody").append(totalsRow);
         }
+
+        // Show the buttons when the response is received and the form is hidden
+        function showButtons() {
+            $("#form-section").hide();
+            $("#filtro-buttons").show();
+        }
+
+        // Hide the buttons when the form is shown
+        function hideButtons() {
+            $("#form-section").show();
+            $("#filtro-buttons").hide();
+        }
+
+        $("#filtro-codigo-button").click(function() {
+            hideButtons();
+            $("#result-section").hide();
+            // Add other actions here when the button is clicked
+        });
+
     </script>
 </body>
 </html>

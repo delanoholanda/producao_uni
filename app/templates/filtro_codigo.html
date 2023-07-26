@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filtro Código</title>
+    <!-- Link Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Filtro por Código</h2>
+        <!-- O dataframe filtrado será inserido aqui -->
+        {{ df_html | safe }}
+        <br>
+        <a href="{{ url_for('index') }}" class="btn waves-effect waves-light">Voltar para a página inicial</a>
+    </div>
+
+    <!-- Link Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
