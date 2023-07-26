@@ -67,10 +67,50 @@
 
     <!-- Custom JavaScript -->
     <script>
-        document.querySelector('form').addEventListener('submit', function () {
-            document.querySelector('.progress').style.display = 'block';
-        });
+        // document.querySelector('form').addEventListener('submit', function () {
+        //     document.querySelector('.progress').style.display = 'block';
+        // });
         
+        // Function to show the loading spinner
+        function showLoading() {
+            document.querySelector('.progress').style.display = 'block';
+        }
+
+        // Function to hide the loading spinner
+        function hideLoading() {
+            document.querySelector('.progress').style.display = 'none';
+        }
+
+        document.querySelector('form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            showLoading(); // Show loading spinner when submitting the form
+            let formData = new FormData(this);
+            $.ajax({
+                url: "/",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    hideLoading(); // Hide loading spinner when response is received
+                    $("#form-section").hide();
+                    $("#result-table").html(response);
+                    $("#result-section").show();
+                    populateBeneficiaryFilter();
+                },
+                error: function (xhr, status, error) {
+                    hideLoading(); // Hide loading spinner on error
+                    console.log("Error:", error);
+                }
+            });
+        });
+
+        $("#upload-another").click(function () {
+            hideLoading(); // Hide loading spinner when "Alterar Arquivo" is clicked
+            $("#result-section").hide();
+            $("#form-section").show();
+        });
+
         $(document).ready(function () {
             $("#upload-form").submit(function (event) {
                 event.preventDefault();
