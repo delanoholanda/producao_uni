@@ -50,7 +50,7 @@
                         {{ table | safe }}
                     </div>
                     <div class="card-footer">
-                        <a href="{{ url_for('index') }}" class="btn waves-effect waves-light blue">Voltar</a>
+                        <a href="{{ url_for('index') }}" class="btn waves-effect waves-light">Voltar</a>
                     </div>
                 </div>
             </div>
@@ -92,8 +92,31 @@
             // Loop through all rows and center the text in table cells
             for (var i = 0; i < rows.length; i++) {
                 var cells = rows[i].querySelectorAll("td");
-                cells.forEach(function (cell) {
+                cells.forEach(function (cell, index) {
                     cell.style.textAlign = "center";
+
+                    // // Check if the cell contains a negative value in the "Saldo Mãe" column
+                    // var cellText = cell.textContent.trim();
+                    // if (cellText.includes("R$ -")) {
+                    //     cell.style.color = "red"; // Set the text color to red for negative values
+                    //     cell.style.fontWeight = "bold"; // Make the text bold for negative values
+                    // }
+                    // Get the cell text content and convert it to a numeric value
+                    // Check if the cell is in the 6th column (index 5)
+                    if (index === 5) {
+                        // Get the cell text content and convert it to a numeric value
+                        var cellText = cell.textContent.trim().replace("R$ ", "").replace(",", "");
+                        var cellValue = parseFloat(cellText);
+
+                        // Check if the cell value is negative
+                        if (cellValue < 0) {
+                            cell.style.color = "red"; // Set the text color to red for negative values
+                            cell.style.fontWeight = "bold"; // Make the text bold for negative values
+                        } else if (cellValue > 0) {
+                            cell.style.color = "green"; // Set the text color to blue for positive values
+                            cell.style.fontWeight = "bold"; // Make the text bold for negative values
+                        }
+                    }
                 });
             }
             });
