@@ -1,3 +1,4 @@
+<!-- templates/filtro_codigo.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,7 @@
         <!-- O dataframe filtrado será inserido aqui -->
         {{ df_html | safe }}
         <br>
-        <a href="{{ url_for('index') }}" class="btn waves-effect waves-light">Voltar para a página inicial</a>
+        <a href="{{ url_for('index') }}?df_html={{ df_index }}" class="btn waves-effect waves-light">Voltar para a página inicial</a>
     </div>
 
     <!-- Link Materialize JavaScript -->

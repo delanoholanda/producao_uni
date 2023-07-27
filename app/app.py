@@ -13,6 +13,7 @@ TEXTO_EXTRAIDO = ""
 CODIGOS_DIFERENTES = ""
 LOTES_DIFERENTES = ""
 DATAFRAME_ORIGINAL = None
+DATAFRAME_INDEX = None
 
 def extrairTextoPdf(caminho_arquivo):
     with open(caminho_arquivo, 'rb') as arquivo:
@@ -352,6 +353,8 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     contagem_ocorrencias = contagem_ocorrencias[filtro]
 
     print(contagem_ocorrencias)
+
+    print("aqui")
     
 
     # print(contagem_ocorrencias)
@@ -402,6 +405,8 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global DATAFRAME_ORIGINAL
+    global DATAFRAME_INDEX
+
     if request.method == 'POST':
         file = request.files['file']
         if file and file.filename.endswith('.pdf'):
@@ -423,11 +428,47 @@ def index():
 
             df_exibir = filtroByCodigo2(df,codigo="5000510")
 
+            DATAFRAME_INDEX = df_exibir
+
             # Convert the DataFrame to an HTML table
-            df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
-            return jsonify(df_html)
+            # df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+            # return jsonify(df_html)
+            return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
 
     return render_template('index.html')
+
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    global DATAFRAME_ORIGINAL
+    global DATAFRAME_INDEX
+
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and file.filename.endswith('.pdf'):
+            # Create a temporary file to store the uploaded PDF data
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file_path = temp_file.name
+                file.save(temp_file_path)
+
+            texto_extraido = extrairTextoPdf(temp_file_path)
+            lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
+            texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
+            df = montarDataFrame(lista_diferentes_codigos, texto_processado)
+            
+            DATAFRAME_ORIGINAL = df
+
+            # Remove the temporary file after processing
+            os.remove(temp_file_path)
+
+            # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
+
+            df_exibir = filtroByCodigo2(df,codigo="5000510")
+
+            DATAFRAME_INDEX = df_exibir
+
+            
+            return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
+    return render_template('home.html')
 
 @app.route('/filtro-5000510', methods=['GET'])
 def filtro_codigo_5000510():
@@ -436,23 +477,33 @@ def filtro_codigo_5000510():
         return "No dataframe available."
     df_exibir = filtroByCodigo(DATAFRAME_ORIGINAL, codigo="5000510")
     df_html = df_exibir.to_html(classes='table table-bordered table-striped center-align', index=False)
-    return render_template('filtro_codigo.html', df_html=df_html)
+    return render_template('filtro_codigo.html', df_html=df_html, df_index=DATAFRAME_INDEX)
 
 @app.route('/filtro-elizza', methods=['GET'])
 def filtro_elizza():
     global DATAFRAME_ORIGINAL
     if DATAFRAME_ORIGINAL is None:
         return "No dataframe available."
-    print(DATAFRAME_ORIGINAL)
+    # print(DATAFRAME_ORIGINAL)
     # Fazendo o filtro com base nos beneficiários desejados
     beneficiarios_desejados = ["ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
                                  "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ", 
-                                 "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES"]
+                                 "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES", "JAMILY COSTA SALDANHA"]
     
     codigo = "5000510"
     df_exibir = filtroByAT(DATAFRAME_ORIGINAL, beneficiarios_desejados, codigo)
     df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
-    return render_template('filtro_codigo.html', df_html=df_html)
+    # return render_template('filtro_codigo.html', df_html=df_html)
+    return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
+
+
+# @app.route('/home', methods=['GET'])
+# def home():
+#     global DATAFRAME_INDEX 
+
+            
+#     return render_template('result.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped'))
+    
 
 @app.route('/filtro-5000518', methods=['GET'])
 def filtro_codigo_5000518():
