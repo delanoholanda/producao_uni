@@ -15,6 +15,11 @@ LOTES_DIFERENTES = ""
 DATAFRAME_ORIGINAL = None
 DATAFRAME_INDEX = None
 
+
+# Define a function to format the values in Brazilian style
+def format_brazilian_currency(value):
+    return 'R$ {:,.2f}'.format(value).replace('.', '*').replace(',', '.').replace('*', ',')
+
 def extrairTextoPdf(caminho_arquivo):
     with open(caminho_arquivo, 'rb') as arquivo:
         leitor_pdf = PyPDF2.PdfReader(arquivo)
@@ -316,12 +321,12 @@ def filtroByCodigo2(dataFrame, codigo):
 
     # Formatar as colunas para o formato de moeda (real brasileiro)
     # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
 
 
     # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
@@ -418,17 +423,26 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     # Resetar o índice do DataFrame resultante
     contagem_ocorrencias.reset_index(drop=True, inplace=True)
 
+    print(contagem_ocorrencias)
+
+    
 
     # Formatar as colunas para o formato de moeda (real brasileiro)
     # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
 
-    
+    print(contagem_ocorrencias)
+    # Formatar as colunas para o formato de moeda (real brasileiro)
+# df['Quantas vezes Passou'] = df['Quantas vezes Passou'].map('R${:,.2f}'.format)
+# df['Valor'] = df['Valor'].map('R${:,.2f}'.format)
+# df['Recebido'] = df['Recebido'].map('R${:,.2f}'.format)
+# df['Parceiro 1 - 60%'] = df['Parceiro 1 - 60%'].map('R${:,.2f}'.format)
+# df['Valor - 40%'] = df['Valor - 40%'].map('R${:,.2f}'.format)
 
     return contagem_ocorrencias
 
