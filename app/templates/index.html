@@ -5,75 +5,46 @@
     <title>PDF File Upload</title>
     <!-- Link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <!-- Link jQuery (required for AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Link Materialize JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <style>
+        /* Custom CSS for the gray background */
+        body {
+            background-color: rgb(233, 229, 229);
+        }
+        .card-container {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="row mt-5">
-            <!-- <div class="col s12 m11 offset-m2">  troquei pela de baixo sem nada--> 
-            <div>
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title center-align">Upload do Arquivo PDF</span>
-                        <div id="form-section">
-                            <form id="upload-form" enctype="multipart/form-data">
-                                <div class="file-field input-field">
-                                    <div class="btn">
-                                        <span>Escolher Arquivo</span>
-                                        <input type="file" name="file" accept=".pdf">
-                                    </div>
-                                    <div class="file-path-wrapper">
-                                        <input class="file-path validate" type="text">
-                                    </div>
-                                </div>
-                                <div class="center-align">
-                                    <button class="btn waves-effect waves-light" type="submit" name="action">Enviar</button>
-                                </div>
-                            </form>
-                            <div class="progress" style="display:none">
-                                <div class="indeterminate"></div>
-                              </div>
-                        </div>
-                        <div id="result-section" style="display: none;">
-                            <div class="center-align mt-3">
-                                <button class="btn waves-effect waves-light" id="upload-another">Alterar Arquivo</button>
-                            </div>
-                            <div id="filtro-buttons">
-                                <!-- <div class="center-align mt-3">
-                                    <a href="{{ url_for('filtro_codigo_5000510') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Código 5000510</a>
-                                </div>
-                                <div class="center-align mt-3">
-                                    <a href="{{ url_for('filtro_codigo_5000518') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Código 5000518</a>
-                                </div> -->
-                                <div class="center-align mt-3">
-                                    <a href="{{ url_for('filtro_elizza') }}" id="filtro-codigo-button" class="btn waves-effect waves-light">Filtrar por Elizza</a>
-                                </div>
-                             <!--    Adicione outros filtros conforme necessário -->
-                            </div> 
-                            <div class="input-field">
-                                <select id="filter-beneficiary" multiple>
-                                    <option value="" selected disabled>Selecione um Beneficiário</option>
-                                </select>
-                                <label for="filter-beneficiary">Filtrar por Beneficiário</label>
-                            </div>
-                            <div class="center-align mt-2">
-                                <button class="btn waves-effect waves-light" id="clear-selection">Remover Seleção</button>
-                            </div>
-                            <div >
-                                <div class="card">
-                                    <div class="card-content">
-                                        <div class="table-container" id="result-table">
-                                            <!-- Result table will be displayed here -->                                         
+            <div class="col s12 m8 offset-m2">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title center-align">Upload do Arquivo PDF</span>
+                            <div id="form-section">
+                                <form method="post" enctype="multipart/form-data">
+                                    <div class="file-field input-field">
+                                        <div class="btn">
+                                            <span>Escolher Arquivo</span>
+                                            <input type="file" name="file" accept=".pdf">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
                                         </div>
                                     </div>
+                                    <div class="center-align">
+                                        <button class="btn waves-effect waves-light" type="submit">Enviar
+                                            <!-- <i class="material-icons right">send</i> -->
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="progress" style="display:none">
+                                    <div class="indeterminate"></div>
                                 </div>
                             </div>
                         </div>
-                        
-                        
                     </div>
                 </div>
             </div>
@@ -82,206 +53,13 @@
 
     <!-- Custom JavaScript -->
     <script>
-        // document.querySelector('form').addEventListener('submit', function () {
-        //     document.querySelector('.progress').style.display = 'block';
-        // });
-        
-        // Function to show the loading spinner
-        function showLoading() {
+        document.querySelector('form').addEventListener('submit', function () {
             document.querySelector('.progress').style.display = 'block';
-        }
-
-        // Function to hide the loading spinner
-        function hideLoading() {
-            document.querySelector('.progress').style.display = 'none';
-        }
-
-        document.querySelector('form').addEventListener('submit', function (event) {
-            event.preventDefault();
-            showLoading(); // Show loading spinner when submitting the form
-            let formData = new FormData(this);
-            $.ajax({
-                url: "/",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    hideLoading(); // Hide loading spinner when response is received
-                    $("#form-section").hide();
-                    $("#result-table").html(response);
-                    $("#result-section").show();
-                    populateBeneficiaryFilter();
-                },
-                error: function (xhr, status, error) {
-                    hideLoading(); // Hide loading spinner on error
-                    console.log("Error:", error);
-                }
-            });
         });
-
-        $("#upload-another").click(function () {
-            hideLoading(); // Hide loading spinner when "Alterar Arquivo" is clicked
-            $("#result-section").hide();
-            $("#form-section").show();
-        });
-
-        $(document).ready(function () {
-            $("#upload-form").submit(function (event) {
-                event.preventDefault();
-                let formData = new FormData(this);
-                $.ajax({
-                    url: "/",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        $("#form-section").hide();
-                        $("#result-table").html(response);
-                        $("#result-section").show();
-
-                        // Populate the filter select with beneficiaries from the table
-                        populateBeneficiaryFilter();
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Error:", error);
-                    }
-                });
-            });
-
-            $("#upload-another").click(function () {
-                $("#result-section").hide();
-                $("#form-section").show();
-            });
-
-            $("#clear-selection").click(function () {
-                $("#filter-beneficiary").val(null);
-                $("#filter-beneficiary").formSelect();
-                filterTableByBeneficiary([]);
-            });
-        });
-
-        // Function to populate the filter select with beneficiaries
-        function populateBeneficiaryFilter() {
-            let beneficiaries = [];
-            $("#result-table tbody tr").each(function () {
-                beneficiaries.push($(this).find("td:nth-child(1)").text());
-            });
-
-            beneficiaries = [...new Set(beneficiaries)];
-
-            // Clear existing options
-            $("#filter-beneficiary").empty();
-
-            // Add new options
-            $("#filter-beneficiary").append("<option value='' selected disabled>Selecione um Beneficiário</option>");
-            beneficiaries.forEach(function (beneficiary) {
-                $("#filter-beneficiary").append(`<option value="${beneficiary}">${beneficiary}</option>`);
-            });
-            
-            // Initialize the Materialize multiselect element
-            $("#filter-beneficiary").formSelect();
-
-            // Add event listener to filter by beneficiary
-            $("#filter-beneficiary").change(function () {
-                let selectedBeneficiaries = $(this).val();
-                filterTableByBeneficiary(selectedBeneficiaries);
-            });
-        }
-
-        // Function to filter the table by beneficiary
-        function filterTableByBeneficiary(selectedBeneficiaries) {
-            $("#result-table tbody tr").each(function () {
-                let rowBeneficiary = $(this).find("td:nth-child(1)").text();
-                if (selectedBeneficiaries.length === 0 || selectedBeneficiaries.includes(rowBeneficiary)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-
-            // Calculate and display the totals row
-            calculateAndDisplayTotals();
-        }
-
-
-        // Function to format the value as Brazilian currency (Real)
-        function formatCurrency(value) {
-            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        // Function to calculate and display the totals row
-        function calculateAndDisplayTotals() {
-            let totalQuantasVezesPassou = 0;
-            let totalValorPorAtendimento = 0;
-            let totalRecebido = 0;
-            let totalDevido = 0;
-            let totalMae = 0;
-            let totalParceiro1 = 0;
-            let totalParceiro2 = 0;
-
-            $("#result-table tbody tr:visible").each(function () {
-                let quantasVezesPassou = parseFloat($(this).find("td:nth-child(2)").text());
-                let valorPorAtendimento = parseFloat($(this).find("td:nth-child(3)").text().replace("R$", "").replace(",", "."));
-                let recebido = parseFloat($(this).find("td:nth-child(4)").text().replace("R$", "").replace(",", "."));
-                let devido = parseFloat($(this).find("td:nth-child(5)").text().replace("R$", "").replace(",", "."));
-                let mae = parseFloat($(this).find("td:nth-child(6)").text().replace("R$", "").replace(",", "."));
-
-                totalQuantasVezesPassou += quantasVezesPassou;
-                totalValorPorAtendimento += valorPorAtendimento;
-                totalParceiro1 += parseFloat($(this).find("td:nth-child(7)").text().replace("R$", "").replace(",", "."));
-                totalParceiro2 += parseFloat($(this).find("td:nth-child(8)").text().replace("R$", "").replace(",", "."));
-                // totalRecebido += recebido;
-                totalDevido += devido
-                totalMae += mae
-            });
-
-            // Format the values as Brazilian currency
-            let formattedTotalValorPorAtendimento = formatCurrency(totalValorPorAtendimento);
-            let formattedTotalParceiro1 = formatCurrency(totalParceiro1);
-            let formattedTotalParceiro2 = formatCurrency(totalParceiro2);
-            // let formattedTotalRecebido = formatCurrency(totalRecebido);
-            // let formattedTotalDevido = formatCurrency(totalDevido);
-            let formattedTotalMae = formatCurrency(totalMae);
-            
-            
-            // Create the totals row
-            let totalsRow = `
-                <tr>
-                    <td><b>Total</b></td>
-                    <td><b>${totalQuantasVezesPassou}</b></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>                    
-                    <td><b>${formattedTotalMae}</b></td>
-                    <td><b>${formattedTotalParceiro1}</b></td>
-                    <td><b>${formattedTotalParceiro2}</b></td>
-                </tr>
-            `;
-
-            // Append the totals row to the table
-            $("#result-table tbody").append(totalsRow);
-        }
-
-        // Show the buttons when the response is received and the form is hidden
-        function showButtons() {
-            $("#form-section").hide();
-            $("#filtro-buttons").show();
-        }
-
-        // Hide the buttons when the form is shown
-        function hideButtons() {
-            $("#form-section").show();
-            $("#filtro-buttons").hide();
-        }
-
-        $("#filtro-codigo-button").click(function() {
-            hideButtons();
-            $("#result-section").hide();
-            // Add other actions here when the button is clicked
-        });
-
+        // Custom JavaScript code for handling file upload and AJAX request goes here
     </script>
+
+    <!-- Link Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>

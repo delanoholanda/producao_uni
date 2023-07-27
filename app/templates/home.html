@@ -5,36 +5,45 @@
     <title>PDF File Upload</title>
     <!-- Link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Custom CSS for the gray background */
+        body {
+            background-color: rgb(233, 229, 229);
+        }
+        .card-container {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="row mt-5">
             <div class="col s12 m8 offset-m2">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title center-align">Upload do Arquivo PDF</span>
-                        <div id="form-section">
-                            <form method="post" enctype="multipart/form-data">
-                                <input type="file" name="file" accept=".pdf">
-                                <input type="submit" value="Submit">
-                            </form>
-                            <!-- <form id="upload-form" enctype="multipart/form-data">
-                                <div class="file-field input-field">
-                                    <div class="btn">
-                                        <span>Escolher Arquivo</span>
-                                        <input type="file" name="file" accept=".pdf">
+                <div class="card-container">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title center-align">Upload do Arquivo PDF</span>
+                            <div id="form-section">
+                                <form method="post" enctype="multipart/form-data">
+                                    <div class="file-field input-field">
+                                        <div class="btn">
+                                            <span>Escolher Arquivo</span>
+                                            <input type="file" name="file" accept=".pdf">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
                                     </div>
-                                    <div class="file-path-wrapper">
-                                        <input class="file-path validate" type="text">
+                                    <div class="center-align">
+                                        <button class="btn waves-effect waves-light" type="submit">Enviar
+                                            <!-- <i class="material-icons right">send</i> -->
+                                        </button>
                                     </div>
+                                </form>
+                                <div class="progress" style="display:none">
+                                    <div class="indeterminate"></div>
                                 </div>
-                                <div class="center-align">
-                                    <button class="btn waves-effect waves-light" type="submit" name="action">Enviar</button>
-                                </div>
-                            </form> -->
-                            <div class="progress" style="display:none">
-                                <div class="indeterminate"></div>
-                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -46,5 +55,8 @@
     <script>
         // Custom JavaScript code for handling file upload and AJAX request goes here
     </script>
+
+    <!-- Link Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>

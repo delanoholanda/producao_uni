@@ -1,0 +1,134 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filtro</title>
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Link Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Custom CSS for the gray background */
+        body {
+            background-color: rgb(233, 229, 229);
+        }
+
+        /* Custom CSS for the background of the button bar */
+        .custom-btn-group {
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Produção Unimed</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Barra de botões com o novo CSS -->
+                        <div class="custom-btn-group btn-group">
+                            <a href="{{ url_for('index') }}?atualizar=True" class="btn waves-effect waves-light">Trocar PDF</a>
+                            <div class="btn-group">
+                                <button type="button" class="btn waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown">
+                                    Filtrar por AT
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <!-- Add your dropdown menu items here -->
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_elizza') }}" onclick="updateSelectedAT('Elizza')">Elizza</a></li>
+                                    <li><a class="dropdown-item" href="#">Fulana</a></li>
+                                    <li><a class="dropdown-item" href="#">Cicrana</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p id="selectedAT">{{ AT }}</p>
+                        {{ table | safe }}
+                    </div>
+                    <!-- <div class="card-footer">
+                        <a href="{{ url_for('index') }}" class="btn waves-effect waves-light blue">Voltar</a>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Link Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- <script>
+        function updateSelectedAT(atName) {
+            const selectedATElement = document.getElementById('selectedAT');
+            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
+        }
+    </script> -->
+    <script>
+        // function updateSelectedAT(atName) {
+        //     const selectedATElement = document.getElementById('selectedAT');
+        //     selectedATElement.textContent = `Produção da AT: ${atName}`;
+        // }
+        document.addEventListener("DOMContentLoaded", function () {
+        var tables = document.querySelectorAll(".table-bordered");
+        tables.forEach(function (table) {
+            var rows = table.rows;
+
+            // Center the text in table header cells (th)
+            var headerRow = rows[0];
+            var headerCells = headerRow.querySelectorAll("th");
+            headerCells.forEach(function (cell) {
+                cell.style.textAlign = "center";
+            });
+
+            // Loop through all rows and center the text in table cells
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].querySelectorAll("td");
+                cells.forEach(function (cell) {
+                    cell.style.textAlign = "center";
+                });
+            }
+            });
+        });
+
+    </script>
+
+    <!-- <script>
+        function updateSelectedAT(atName) {
+            const selectedATElement = document.getElementById('selectedAT');
+            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
+        }
+    </script>
+    <script>
+        function updateSelectedAT(atName) {
+            const selectedATElement = document.getElementById('selectedAT');
+            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
+    
+            // Perform AJAX request to fetch the filtered data
+            fetch('/filter-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    atName: atName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the table data with the fetched data
+                const tableContainer = document.getElementById('tableContainer');
+                tableContainer.innerHTML = data.html;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+    </script> -->
+
+</body>
+</html>

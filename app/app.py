@@ -240,24 +240,24 @@ def filtroByCodigo(dataFrame, codigo):
     contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
 
     # Renomear as colunas do DataFrame resultante
-    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantidade']
 
     # Exibir o DataFrame resultante
     # print(contagem_ocorrencias)
 
 
     # Criando a nova coluna "valor" e atribuindo o valor de 50,00 em todas as linhas
-    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+    contagem_ocorrencias['Valor/Atendimento'] = 50.00
 
     # Criando as novas colunas "Parceiro 1 - 60%" e "Valor - 40%" com os valores calculados
-    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Quantas vezes Passou'] * contagem_ocorrencias['Valor Por Atendimento'] * 0.6
-    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Quantas vezes Passou'] * contagem_ocorrencias['Valor Por Atendimento'] * 0.4
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Quantidade'] * contagem_ocorrencias['Valor/Atendimento'] * 0.6
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Quantidade'] * contagem_ocorrencias['Valor/Atendimento'] * 0.4
 
     # Formatar as colunas para o formato de moeda (real brasileiro)
-    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+    # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].map('R$ {:,.2f}'.format)
 
 
 
@@ -279,7 +279,7 @@ def filtroByCodigo2(dataFrame, codigo):
     contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
 
     # Renomear as colunas do DataFrame resultante
-    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantidade']
 
 
     
@@ -293,35 +293,35 @@ def filtroByCodigo2(dataFrame, codigo):
     #     else:
     #         print(f"{beneficiario} não está presente no DataFrame.")
 
-    # Criando a nova coluna "Valor Por Atendimento" e atribuindo o valor de 50,00 em todas as linhas
-    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+    # Criando a nova coluna "Valor/Atendimento" e atribuindo o valor de 50,00 em todas as linhas
+    contagem_ocorrencias['Valor/Atendimento'] = 50.00
 
     
     # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
     def calcular_valores(row):
         if row['Beneficiário'] in beneficiarios_especificos:
-            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.5
-            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.5
+            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
         else:
-            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.6
-            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.6
+            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
 
-        recebido = row['Quantas vezes Passou'] * row['Valor Por Atendimento']
+        recebido = row['Quantidade'] * row['Valor/Atendimento']
         devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
         mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
-        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Mãe Faltou': mae_faltou, 'Parceiro 1 - 60%': parceiro_1, 'Parceiro 2 - 40%': parceiro_2})
+        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
 
-    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Mãe Faltou", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
-    contagem_ocorrencias[['Recebido', 'Devido', 'Mãe Faltou', 'Parceiro 1 - 60%', 'Parceiro 2 - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
+    contagem_ocorrencias[['Recebido', 'Devido', 'Saldo Mãe', 'Parceiro - 60%', 'Parceiro - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
 
     # Formatar as colunas para o formato de moeda (real brasileiro)
-    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
+    # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].map('R$ {:,.2f}'.format)
     contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
     contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Mãe Faltou'] = contagem_ocorrencias['Mãe Faltou'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].map('R$ {:,.2f}'.format)
 
 
     # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
@@ -342,9 +342,9 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     contagem_ocorrencias = df_codigo['Beneficiário'].value_counts().reset_index()
 
     # Renomear as colunas do DataFrame resultante
-    contagem_ocorrencias.columns = ['Beneficiário', 'Quantas vezes Passou']
+    contagem_ocorrencias.columns = ['Beneficiário', 'Quantidade']
 
-    print(contagem_ocorrencias)
+    # print(contagem_ocorrencias)
 
     # Filtro para manter apenas as linhas cujo beneficiário está na lista de beneficiários específicos
     filtro = contagem_ocorrencias["Beneficiário"].isin(beneficiarios_desejados)
@@ -352,9 +352,9 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     # Aplicar o filtro ao DataFrame
     contagem_ocorrencias = contagem_ocorrencias[filtro]
 
-    print(contagem_ocorrencias)
+    # print(contagem_ocorrencias)
 
-    print("aqui")
+    # print("aqui")
     
 
     # print(contagem_ocorrencias)
@@ -366,81 +366,114 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     #     else:
     #         print(f"{beneficiario} não está presente no DataFrame.")
 
-    # Criando a nova coluna "Valor Por Atendimento" e atribuindo o valor de 50,00 em todas as linhas
-    contagem_ocorrencias['Valor Por Atendimento'] = 50.00
+    # Criando a nova coluna "Valor/Atendimento" e atribuindo o valor de 50,00 em todas as linhas
+    contagem_ocorrencias['Valor/Atendimento'] = 50.00
 
     
     # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
     def calcular_valores(row):
-        if row['Beneficiário'] in beneficiarios_desejados:
-            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.5
-            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+        if row['Beneficiário'] in beneficiarios_especificos:
+            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.5
+            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
         else:
-            parceiro_1 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.6
-            parceiro_2 = row['Quantas vezes Passou'] * row['Valor Por Atendimento'] * 0.4
+            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.6
+            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
 
-        recebido = row['Quantas vezes Passou'] * row['Valor Por Atendimento']
+        recebido = row['Quantidade'] * row['Valor/Atendimento']
         devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
         mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
-        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Mãe Faltou': mae_faltou, 'Parceiro 1 - 60%': parceiro_1, 'Parceiro 2 - 40%': parceiro_2})
+        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
 
-    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Mãe Faltou", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
-    contagem_ocorrencias[['Recebido', 'Devido', 'Mãe Faltou', 'Parceiro 1 - 60%', 'Parceiro 2 - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
+    contagem_ocorrencias[['Recebido', 'Devido', 'Saldo Mãe', 'Parceiro - 60%', 'Parceiro - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
 
-    # Formatar as colunas para o formato de moeda (real brasileiro)
-    # contagem_ocorrencias['Quantas vezes Passou'] = contagem_ocorrencias['Quantas vezes Passou'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor Por Atendimento'] = contagem_ocorrencias['Valor Por Atendimento'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Mãe Faltou'] = contagem_ocorrencias['Mãe Faltou'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 1 - 60%'] = contagem_ocorrencias['Parceiro 1 - 60%'].map('R$ {:,.2f}'.format)
-    contagem_ocorrencias['Parceiro 2 - 40%'] = contagem_ocorrencias['Parceiro 2 - 40%'].map('R$ {:,.2f}'.format)
+    # print(contagem_ocorrencias)
 
     # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
     contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
 
+    # Calcular os totais das colunas
+    total_quantas_vezes_passou = contagem_ocorrencias["Quantidade"].sum()
+    total_recebido = contagem_ocorrencias["Recebido"].sum()
+    total_devido = contagem_ocorrencias["Devido"].sum()
+    total_mae_faltou = contagem_ocorrencias["Saldo Mãe"].sum()
+    total_parceiro_1 = contagem_ocorrencias["Parceiro - 60%"].sum()
+    total_parceiro_2 = contagem_ocorrencias["Parceiro - 40%"].sum()
+
+    # Criar a nova linha
+    total_row = {
+        "Beneficiário": "Total",
+        "Quantidade": total_quantas_vezes_passou,
+        "Valor/Atendimento": 50.0,
+        "Recebido": total_recebido,
+        "Devido": total_devido,
+        "Saldo Mãe": total_mae_faltou,
+        "Parceiro - 60%": total_parceiro_1,
+        "Parceiro - 40%": total_parceiro_2
+    }
+
+    # Concatenar o DataFrame com a nova linha
+    contagem_ocorrencias = pd.concat([contagem_ocorrencias, pd.DataFrame(total_row, index=[len(contagem_ocorrencias)])])
+
+    # Resetar o índice do DataFrame resultante
+    contagem_ocorrencias.reset_index(drop=True, inplace=True)
+
+
+    # Formatar as colunas para o formato de moeda (real brasileiro)
+    # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
+    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].map('R$ {:,.2f}'.format)
+    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].map('R$ {:,.2f}'.format)
+
+    
+
     return contagem_ocorrencias
 
+
+# @app.route('/', methods=['GET', 'POST'])
+# def index():
+#     global DATAFRAME_ORIGINAL
+#     global DATAFRAME_INDEX
+
+#     if request.method == 'POST':
+#         file = request.files['file']
+#         if file and file.filename.endswith('.pdf'):
+#             # Create a temporary file to store the uploaded PDF data
+#             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+#                 temp_file_path = temp_file.name
+#                 file.save(temp_file_path)
+
+#             texto_extraido = extrairTextoPdf(temp_file_path)
+#             lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
+#             texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
+#             df = montarDataFrame(lista_diferentes_codigos, texto_processado)
+#             DATAFRAME_ORIGINAL = df
+
+#             # Remove the temporary file after processing
+#             os.remove(temp_file_path)
+
+#             # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
+
+#             df_exibir = filtroByCodigo2(df,codigo="5000510")
+
+#             DATAFRAME_INDEX = df_exibir
+
+#             # Convert the DataFrame to an HTML table
+#             # df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+#             # return jsonify(df_html)
+#             return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False))
+
+#     return render_template('index.html')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global DATAFRAME_ORIGINAL
     global DATAFRAME_INDEX
-
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and file.filename.endswith('.pdf'):
-            # Create a temporary file to store the uploaded PDF data
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file_path = temp_file.name
-                file.save(temp_file_path)
-
-            texto_extraido = extrairTextoPdf(temp_file_path)
-            lista_diferentes_lotes, lista_diferentes_codigos = buscaLotesCodigos(texto_extraido)
-            texto_processado = tratarTextoExtraido(texto_extraido, lista_diferentes_lotes, lista_diferentes_codigos)
-            df = montarDataFrame(lista_diferentes_codigos, texto_processado)
-            DATAFRAME_ORIGINAL = df
-
-            # Remove the temporary file after processing
-            os.remove(temp_file_path)
-
-            # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
-
-            df_exibir = filtroByCodigo2(df,codigo="5000510")
-
-            DATAFRAME_INDEX = df_exibir
-
-            # Convert the DataFrame to an HTML table
-            # df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
-            # return jsonify(df_html)
-            return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
-
-    return render_template('index.html')
-
-@app.route('/home', methods=['GET', 'POST'])
-def home():
-    global DATAFRAME_ORIGINAL
-    global DATAFRAME_INDEX
+    
+    atualizar_param = request.args.get('atualizar')
 
     if request.method == 'POST':
         file = request.files['file']
@@ -467,17 +500,15 @@ def home():
             DATAFRAME_INDEX = df_exibir
 
             
-            return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
-    return render_template('home.html')
+            return render_template('dados_producao.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False))
+    
+    if DATAFRAME_INDEX is None or atualizar_param == 'True':
+        # return "No dataframe available."
+        return render_template('index.html')
+    else:
+        return render_template('dados_producao.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped', index=False))
 
-@app.route('/filtro-5000510', methods=['GET'])
-def filtro_codigo_5000510():
-    global DATAFRAME_ORIGINAL
-    if DATAFRAME_ORIGINAL is None:
-        return "No dataframe available."
-    df_exibir = filtroByCodigo(DATAFRAME_ORIGINAL, codigo="5000510")
-    df_html = df_exibir.to_html(classes='table table-bordered table-striped center-align', index=False)
-    return render_template('filtro_codigo.html', df_html=df_html, df_index=DATAFRAME_INDEX)
+
 
 @app.route('/filtro-elizza', methods=['GET'])
 def filtro_elizza():
@@ -488,29 +519,29 @@ def filtro_elizza():
     # Fazendo o filtro com base nos beneficiários desejados
     beneficiarios_desejados = ["ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
                                  "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ", 
-                                 "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES", "JAMILY COSTA SALDANHA"]
+                                 "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES"]
     
     codigo = "5000510"
     df_exibir = filtroByAT(DATAFRAME_ORIGINAL, beneficiarios_desejados, codigo)
-    df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+    # df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
     # return render_template('filtro_codigo.html', df_html=df_html)
-    return render_template('result.html', table=df_exibir.to_html(classes='table table-bordered table-striped'))
+    return render_template('filtro_AT.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False), AT="Produção da Elizza")
+    # return jsonify({'html': df_html})
 
 
-# @app.route('/home', methods=['GET'])
-# def home():
-#     global DATAFRAME_INDEX 
-
-            
-#     return render_template('result.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped'))
+@app.route('/all_dados', methods=['GET'])
+def all_dados():
+    global DATAFRAME_INDEX
+    if DATAFRAME_INDEX is None:
+        return "No dataframe available."
+    # print(DATAFRAME_ORIGINAL)
+    # Fazendo o filtro com base nos beneficiários desejados
     
+    # df_html = DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped', index=False)
+    # return render_template('filtro_codigo.html', df_html=df_html)
+    return render_template('result.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped'))
 
-@app.route('/filtro-5000518', methods=['GET'])
-def filtro_codigo_5000518():
-    global DATAFRAME_ORIGINAL
-    df_exibir = filtroByCodigo(DATAFRAME_ORIGINAL, codigo="5000518")
-    df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
-    return render_template('filtro_codigo.html', df_html=df_html)
+
 
 
 if __name__ == '__main__':
