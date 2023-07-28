@@ -5,6 +5,16 @@ import pandas as pd
 def format_brazilian_currency(value):
     return 'R$ {:,.2f}'.format(value).replace('.', '*').replace(',', '.').replace('*', ',')
 
+    
+# Função para formatar os valores da coluna "Quantidade"
+def format_quantity(quantity):
+    if isinstance(quantity, float):
+        if quantity.is_integer():
+            return f"{int(quantity)}"
+        else:
+            return f"{quantity:.1f}".replace('.', ',')
+    return f"{quantity}"
+
 
 def buscaLotesCodigos(texto):
     # Dividir o texto em linhas
@@ -171,7 +181,7 @@ def filtroByCodigo2(dataFrame, codigo):
     return contagem_ocorrencias
 
 
-def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
+def filtroByAT(dataFrame, beneficiarios_desejados, codigo, profissional):
     
     # Lista de beneficiários específicos
     beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
@@ -193,91 +203,129 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     # Aplicar o filtro ao DataFrame
     contagem_ocorrencias = contagem_ocorrencias[filtro]
 
-    # print(contagem_ocorrencias)
 
-    # print("aqui")
+    # Verificar se o DataFrame filtrado está vazio
+    if contagem_ocorrencias.empty:
+        # print("Nenhum beneficiário encontrado na lista de beneficiários desejados.")
+        return contagem_ocorrencias
+        # Aqui você pode definir uma ação alternativa, como atribuir outro DataFrame ou sair do programa.
+    else:
+
+
+        # print(contagem_ocorrencias)
+
+        # Criando a nova coluna "Valor/Atendimento" e atribuindo o valor de 50,00 em todas as linhas
+        contagem_ocorrencias['Valor/Atendimento'] = 50.00
+
+        
+
+        if profissional == "Elizza":
+            # Alterar os valores na coluna "Quantas vezes Passou"
+            contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO"]), "Quantidade"] /= 2
+            
+
+            # # Alterar os valores na coluna "Quantas vezes Passou"
+            # contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO"]), "Quantidade"] /= 2
+
+            # # Formatar os valores com duas casas decimais para 2.5 e manter os inteiros para o restante
+            # contagem_ocorrencias["Quantidade"] = contagem_ocorrencias["Quantidade"].apply(lambda x: f"{x:.1f}" if x % 1 != 0 else int(x))
+        
+        # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
+        def calcular_valores(row):
+            if row['Beneficiário'] in beneficiarios_especificos:
+                parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.5
+                parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
+            else:
+                parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.6
+                parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
+
+            recebido = row['Quantidade'] * row['Valor/Atendimento']
+            devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
+            mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
+            return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
+
+        # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
+        contagem_ocorrencias[['Recebido', 'Devido', 'Saldo Mãe', 'Parceiro - 60%', 'Parceiro - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+
+        # Criando a nova coluna "Imposto Retido" e calculando o valor
+        contagem_ocorrencias['Imposto Retido'] = contagem_ocorrencias['Quantidade'] * 5.02
+        # print(contagem_ocorrencias)
+
+        # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+        contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
+
+        # Calcular os totais das colunas
+        total_quantas_vezes_passou = contagem_ocorrencias["Quantidade"].sum()
+        total_recebido = contagem_ocorrencias["Recebido"].sum()
+        total_devido = contagem_ocorrencias["Devido"].sum()
+        total_mae_faltou = contagem_ocorrencias["Saldo Mãe"].sum()
+        total_parceiro_1 = contagem_ocorrencias["Parceiro - 60%"].sum()
+        total_parceiro_2 = contagem_ocorrencias["Parceiro - 40%"].sum()
+        total_retido = contagem_ocorrencias["Imposto Retido"].sum()
+
+        # Criar a nova linha
+        total_row = {
+            "Beneficiário": "Total",
+            "Quantidade": total_quantas_vezes_passou,
+            "Valor/Atendimento": 50.0,
+            "Recebido": total_recebido,
+            "Devido": total_devido,
+            "Saldo Mãe": total_mae_faltou,
+            "Parceiro - 60%": total_parceiro_1,
+            "Parceiro - 40%": total_parceiro_2,
+            "Imposto Retido": total_retido
+        }
+
+        # Concatenar o DataFrame com a nova linha
+        contagem_ocorrencias = pd.concat([contagem_ocorrencias, pd.DataFrame(total_row, index=[len(contagem_ocorrencias)])])
+
+        # Resetar o índice do DataFrame resultante
+        contagem_ocorrencias.reset_index(drop=True, inplace=True)
+
+        # print(contagem_ocorrencias)
+
+        
+        # Aplicar a função de formatação à coluna "Quantidade"
+        contagem_ocorrencias["Quantidade"] = contagem_ocorrencias["Quantidade"].apply(format_quantity)
+
+        # Formatar as colunas para o formato de moeda (real brasileiro)
+        # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
+        contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
+        contagem_ocorrencias['Imposto Retido'] = contagem_ocorrencias['Imposto Retido'].apply(format_brazilian_currency)
+
     
+        # print(contagem_ocorrencias)
+        # Formatar as colunas para o formato de moeda (real brasileiro)
+    # df['Quantas vezes Passou'] = df['Quantas vezes Passou'].map('R${:,.2f}'.format)
+    # df['Valor'] = df['Valor'].map('R${:,.2f}'.format)
+    # df['Recebido'] = df['Recebido'].map('R${:,.2f}'.format)
+    # df['Parceiro 1 - 60%'] = df['Parceiro 1 - 60%'].map('R${:,.2f}'.format)
+    # df['Valor - 40%'] = df['Valor - 40%'].map('R${:,.2f}'.format)
 
-    # print(contagem_ocorrencias)
+        return contagem_ocorrencias
 
-    #     # Verificando se os beneficiários estão no DataFrame
-    # for beneficiario in beneficiarios_especificos:
-    #     if beneficiario in contagem_ocorrencias["Beneficiário"].values:
-    #         print(f"{beneficiario} está presente no DataFrame.")
-    #     else:
-    #         print(f"{beneficiario} não está presente no DataFrame.")
 
-    # Criando a nova coluna "Valor/Atendimento" e atribuindo o valor de 50,00 em todas as linhas
-    contagem_ocorrencias['Valor/Atendimento'] = 50.00
-
+# Função que retorna a lista de beneficiários desejados com base no nome do profissional
+def obter_beneficiarios_desejados(profissional):
+    if profissional == "Elizza":
+        beneficiarios_desejados = [
+            "ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
+            "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ",
+            "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES"
+        ]
+    elif profissional == "Gabriela":
+        beneficiarios_desejados = [
+            "ARTHUR DE LIMA VILAR", "ARTHUR MOREIRA CASTRO", "CARLOS HENRIK O BATISTA",
+            "ALVARO WESLEY SILVA LEMOS", "FRANCISCO RAFAEL P SILVA", "ISIS MARIA DANTAS SOARES",
+            "JOAO ERNANDO LOPES LIMA", "JOAO MIGUEL N DE ASSIS", "MANUEL IDEFONSO DA CUNHA",
+            "MARIA ISABELLY GOMES LIMA", "NOAH OLIVEIRA RODRIGUES", "OSAIAS ALMEIDA CASTRO NT",
+            "WILLIAM LEVY C DE BRITO", "YAN WEVERTON BATISTA MELO" ]
+    else:
+        beneficiarios_desejados = []  # Caso nenhum profissional corresponda, retorna lista vazia
     
-    # Função para calcular os valores específicos para os beneficiários "CECILIA PEREIRA MACHADO" e "JOAO MIGUEL PARENTE GOMES"
-    def calcular_valores(row):
-        if row['Beneficiário'] in beneficiarios_especificos:
-            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.5
-            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
-        else:
-            parceiro_1 = row['Quantidade'] * row['Valor/Atendimento'] * 0.6
-            parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
-
-        recebido = row['Quantidade'] * row['Valor/Atendimento']
-        devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
-        mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
-        return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
-
-    # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
-    contagem_ocorrencias[['Recebido', 'Devido', 'Saldo Mãe', 'Parceiro - 60%', 'Parceiro - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
-
-    # print(contagem_ocorrencias)
-
-    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
-    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
-
-    # Calcular os totais das colunas
-    total_quantas_vezes_passou = contagem_ocorrencias["Quantidade"].sum()
-    total_recebido = contagem_ocorrencias["Recebido"].sum()
-    total_devido = contagem_ocorrencias["Devido"].sum()
-    total_mae_faltou = contagem_ocorrencias["Saldo Mãe"].sum()
-    total_parceiro_1 = contagem_ocorrencias["Parceiro - 60%"].sum()
-    total_parceiro_2 = contagem_ocorrencias["Parceiro - 40%"].sum()
-
-    # Criar a nova linha
-    total_row = {
-        "Beneficiário": "Total",
-        "Quantidade": total_quantas_vezes_passou,
-        "Valor/Atendimento": 50.0,
-        "Recebido": total_recebido,
-        "Devido": total_devido,
-        "Saldo Mãe": total_mae_faltou,
-        "Parceiro - 60%": total_parceiro_1,
-        "Parceiro - 40%": total_parceiro_2
-    }
-
-    # Concatenar o DataFrame com a nova linha
-    contagem_ocorrencias = pd.concat([contagem_ocorrencias, pd.DataFrame(total_row, index=[len(contagem_ocorrencias)])])
-
-    # Resetar o índice do DataFrame resultante
-    contagem_ocorrencias.reset_index(drop=True, inplace=True)
-
-    # print(contagem_ocorrencias)
-
-    
-
-    # Formatar as colunas para o formato de moeda (real brasileiro)
-    # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
-    contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].apply(format_brazilian_currency)
-    contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].apply(format_brazilian_currency)
-    contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].apply(format_brazilian_currency)
-    contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
-    contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
-    contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
-
-    # print(contagem_ocorrencias)
-    # Formatar as colunas para o formato de moeda (real brasileiro)
-# df['Quantas vezes Passou'] = df['Quantas vezes Passou'].map('R${:,.2f}'.format)
-# df['Valor'] = df['Valor'].map('R${:,.2f}'.format)
-# df['Recebido'] = df['Recebido'].map('R${:,.2f}'.format)
-# df['Parceiro 1 - 60%'] = df['Parceiro 1 - 60%'].map('R${:,.2f}'.format)
-# df['Valor - 40%'] = df['Valor - 40%'].map('R${:,.2f}'.format)
-
-    return contagem_ocorrencias
+    return beneficiarios_desejados

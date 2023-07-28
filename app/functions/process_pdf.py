@@ -7,16 +7,44 @@ def extrairTextoPdf(caminho_arquivo):
     with open(caminho_arquivo, 'rb') as arquivo:
         leitor_pdf = PyPDF2.PdfReader(arquivo)
         num_paginas = len(leitor_pdf.pages)
+        linha_producao_movimento = ""
 
         texto_completo = 'Lote Nota Data Beneficiário Total Código Qt. Cobr Qt. Paga Valor Qtd CH Subtotal\n'
         padrao_pagina = re.compile(r'Página:\d{2}/\d{2}/\d{4} \d{2}:\d{2}:\d{2}Modelo Completo')
         padrao_texto_adicional = re.compile(r'\d+Data de Emissão:.*?SERTAO CENTRAL', re.DOTALL)
         padrao_cabecalho = re.compile(r'Lote Nota Data Beneficiário Código Qt\. Cobr Qt\. Paga Valor Qtd CH Subtotal Total Nota', re.DOTALL)
 
+
+        # Recupera do PDF o número da Produção e Movimentação
+        for pagina in range(0,1):
+            pagina_pdf = leitor_pdf.pages[pagina]
+            texto = pagina_pdf.extract_text()
+
+            # Find the line containing the pattern "2023/6/97-Q"
+            pattern = r"\d{4}/\d/\d{1,3}-[A-Z]{1}"
+            linha_producao_movimento = re.search(pattern, texto)
+            if linha_producao_movimento:
+               continue 
+            else:    
+                return "", linha_producao_movimento
+
+            # if linha_producao_movimento:
+            #     print(linha_producao_movimento.group())
+            # else:
+            #     print("Pattern not found.")
+
+
         for pagina in range(num_paginas):
             pagina_pdf = leitor_pdf.pages[pagina]
             texto = pagina_pdf.extract_text()
 
+
+            # # Find the line containing the pattern "2023/6/97-Q"
+            # padtaProducaoMovimento = r"\d{4}/\d/\d{1,3}-[A-Z]{1}"
+            # linha_producao_movimento = re.search(padtaProducaoMovimento, texto)
+            # print("aquiiii")
+            # print(linha_producao_movimento)
+            
             # Verifica se a página contém o padrão "Página: [data e hora]"
             if padrao_pagina.search(texto):
                 # Remove o texto correspondente ao padrão da página
@@ -53,7 +81,9 @@ def extrairTextoPdf(caminho_arquivo):
         if inicio_remocao != -1:
             texto_completo = texto_completo[:inicio_remocao]
 
-        return texto_completo.strip()  # Remover espaços em branco extras no início e no final do texto
+        
+
+        return texto_completo.strip(), linha_producao_movimento # Remover espaços em branco extras no início e no final do texto
     
 def tratarTextoExtraido(texto, lista_diferentes_lotes, lista_diferentes_codigos):
     
