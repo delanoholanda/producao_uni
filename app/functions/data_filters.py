@@ -259,7 +259,7 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     # Resetar o índice do DataFrame resultante
     contagem_ocorrencias.reset_index(drop=True, inplace=True)
 
-    print(contagem_ocorrencias)
+    # print(contagem_ocorrencias)
 
     
 
@@ -272,7 +272,7 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo):
     contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
     contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
 
-    print(contagem_ocorrencias)
+    # print(contagem_ocorrencias)
     # Formatar as colunas para o formato de moeda (real brasileiro)
 # df['Quantas vezes Passou'] = df['Quantas vezes Passou'].map('R${:,.2f}'.format)
 # df['Valor'] = df['Valor'].map('R${:,.2f}'.format)

@@ -3,9 +3,9 @@
 import tempfile
 import os
 from flask import Flask, render_template, request, jsonify
-import pandas as pd
+# import pandas as pd
 
-from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido, format_brazilian_currency
+from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
 from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT
 from functions.create_dataframe import montarDataFrame
 
@@ -64,7 +64,6 @@ def filtro_elizza():
     global DATAFRAME_ORIGINAL
     if DATAFRAME_ORIGINAL is None:
         return "No dataframe available."
-    # print(DATAFRAME_ORIGINAL)
     # Fazendo o filtro com base nos beneficiários desejados
     beneficiarios_desejados = ["ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
                                  "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ", 
