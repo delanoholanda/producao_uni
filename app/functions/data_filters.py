@@ -118,10 +118,10 @@ def filtroByCodigo(dataFrame, codigo):
     return contagem_ocorrencias
 
 
-def filtroByCodigo2(dataFrame, codigo):
+def filtroByCodigo2(dataFrame, codigo, beneficiarios_especificos):
 
-    # Lista de beneficiários específicos
-    beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
+    # # Lista de beneficiários específicos
+    # beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
 
     # Selecione apenas as linhas com o código "5000510"
     df_codigo = dataFrame[dataFrame['Código'] == codigo]
@@ -158,12 +158,66 @@ def filtroByCodigo2(dataFrame, codigo):
             parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
 
         recebido = row['Quantidade'] * row['Valor/Atendimento']
-        devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
-        mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
+        devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else row['Quantidade'] * row['Valor/Atendimento'] # 0.00
+        mae_faltou = recebido - devido # if row['Beneficiário'] in beneficiarios_especificos else 0.00
         return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
 
     # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
     contagem_ocorrencias[['Recebido', 'Devido', 'Saldo Mãe', 'Parceiro - 60%', 'Parceiro - 40%']] = contagem_ocorrencias.apply(calcular_valores, axis=1)
+
+
+    # # Formatar as colunas para o formato de moeda (real brasileiro)
+    # # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
+    # contagem_ocorrencias['Valor/Atendimento'] = contagem_ocorrencias['Valor/Atendimento'].apply(format_brazilian_currency)
+    # contagem_ocorrencias['Recebido'] = contagem_ocorrencias['Recebido'].apply(format_brazilian_currency)
+    # contagem_ocorrencias['Devido'] = contagem_ocorrencias['Devido'].apply(format_brazilian_currency)
+    # contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
+    # contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
+    # contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
+
+
+    # # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+    # contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
+    # Criando a nova coluna "Imposto Retido" e calculando o valor
+    contagem_ocorrencias['Imposto Retido'] = contagem_ocorrencias['Quantidade'] * 5.02
+    # print(contagem_ocorrencias)
+
+    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
+    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
+
+    # Calcular os totais das colunas
+    total_quantas_vezes_passou = contagem_ocorrencias["Quantidade"].sum()
+    total_recebido = contagem_ocorrencias["Recebido"].sum()
+    total_devido = contagem_ocorrencias["Devido"].sum()
+    total_mae_faltou = contagem_ocorrencias["Saldo Mãe"].sum()
+    total_parceiro_1 = contagem_ocorrencias["Parceiro - 60%"].sum()
+    total_parceiro_2 = contagem_ocorrencias["Parceiro - 40%"].sum()
+    total_retido = contagem_ocorrencias["Imposto Retido"].sum()
+
+    # Criar a nova linha
+    total_row = {
+        "Beneficiário": "Total",
+        "Quantidade": total_quantas_vezes_passou,
+        "Valor/Atendimento": 50.0,
+        "Recebido": total_recebido,
+        "Devido": total_devido,
+        "Saldo Mãe": total_mae_faltou,
+        "Parceiro - 60%": total_parceiro_1,
+        "Parceiro - 40%": total_parceiro_2,
+        "Imposto Retido": total_retido
+    }
+
+    # Concatenar o DataFrame com a nova linha
+    contagem_ocorrencias = pd.concat([contagem_ocorrencias, pd.DataFrame(total_row, index=[len(contagem_ocorrencias)])])
+
+    # Resetar o índice do DataFrame resultante
+    contagem_ocorrencias.reset_index(drop=True, inplace=True)
+
+    # print(contagem_ocorrencias)
+
+    
+    # Aplicar a função de formatação à coluna "Quantidade"
+    contagem_ocorrencias["Quantidade"] = contagem_ocorrencias["Quantidade"].apply(format_quantity)
 
     # Formatar as colunas para o formato de moeda (real brasileiro)
     # contagem_ocorrencias['Quantidade'] = contagem_ocorrencias['Quantidade'].map('R${:,.2f}'.format)
@@ -173,15 +227,14 @@ def filtroByCodigo2(dataFrame, codigo):
     contagem_ocorrencias['Saldo Mãe'] = contagem_ocorrencias['Saldo Mãe'].apply(format_brazilian_currency)
     contagem_ocorrencias['Parceiro - 60%'] = contagem_ocorrencias['Parceiro - 60%'].apply(format_brazilian_currency)
     contagem_ocorrencias['Parceiro - 40%'] = contagem_ocorrencias['Parceiro - 40%'].apply(format_brazilian_currency)
+    contagem_ocorrencias['Imposto Retido'] = contagem_ocorrencias['Imposto Retido'].apply(format_brazilian_currency)
 
 
-    # Ordenar o DataFrame pelo nome dos beneficiários em ordem alfabética
-    contagem_ocorrencias = contagem_ocorrencias.sort_values(by='Beneficiário', ignore_index=True)
 
     return contagem_ocorrencias
 
 
-def filtroByAT(dataFrame, beneficiarios_desejados, codigo, profissional):
+def filtroByAT(dataFrame, beneficiarios_desejados, beneficiarios_especificos, codigo, profissional):
     
     # Lista de beneficiários específicos
     beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
@@ -221,7 +274,7 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo, profissional):
 
         if profissional == "Elizza":
             # Alterar os valores na coluna "Quantas vezes Passou"
-            contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO"]), "Quantidade"] /= 2
+            contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ"]), "Quantidade"] /= 2
             
 
             # # Alterar os valores na coluna "Quantas vezes Passou"
@@ -240,8 +293,8 @@ def filtroByAT(dataFrame, beneficiarios_desejados, codigo, profissional):
                 parceiro_2 = row['Quantidade'] * row['Valor/Atendimento'] * 0.4
 
             recebido = row['Quantidade'] * row['Valor/Atendimento']
-            devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else 0.00
-            mae_faltou = recebido - devido if row['Beneficiário'] in beneficiarios_especificos else 0.00
+            devido = 40 * 50.00 if row['Beneficiário'] in beneficiarios_especificos else row['Quantidade'] * row['Valor/Atendimento']
+            mae_faltou = recebido - devido # if row['Beneficiário'] in beneficiarios_especificos else 0.00
             return pd.Series({'Recebido': recebido, 'Devido': devido, 'Saldo Mãe': mae_faltou, 'Parceiro - 60%': parceiro_1, 'Parceiro - 40%': parceiro_2})
 
         # Aplicando a função aos dados do DataFrame para calcular as colunas "Recebido", "Devido", "Saldo Mãe", "Parceiro 1 - 60%" e "Parceiro 2 - 40%"
@@ -316,16 +369,28 @@ def obter_beneficiarios_desejados(profissional):
         beneficiarios_desejados = [
             "ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
             "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ",
-            "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES"
-        ]
+            "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES",
+            "CARLOS EDUARDO A OLIVEIRA" ]
     elif profissional == "Gabriela":
         beneficiarios_desejados = [
             "ARTHUR DE LIMA VILAR", "ARTHUR MOREIRA CASTRO", "CARLOS HENRIK O BATISTA",
             "ALVARO WESLEY SILVA LEMOS", "FRANCISCO RAFAEL P SILVA", "ISIS MARIA DANTAS SOARES",
             "JOAO ERNANDO LOPES LIMA", "JOAO MIGUEL N DE ASSIS", "MANUEL IDEFONSO DA CUNHA",
             "MARIA ISABELLY GOMES LIMA", "NOAH OLIVEIRA RODRIGUES", "OSAIAS ALMEIDA CASTRO NT",
-            "WILLIAM LEVY C DE BRITO", "YAN WEVERTON BATISTA MELO" ]
+            "WILLIAM LEVY C DE BRITO", "YAN WEVERTON BATISTA MELO"]
     else:
         beneficiarios_desejados = []  # Caso nenhum profissional corresponda, retorna lista vazia
     
     return beneficiarios_desejados
+
+
+def obter_beneficiarios_AT():
+    # Lista de beneficiários específicos
+    beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES", "ADRIAN LEVI COSTA AQUINO",
+                                  "ANGEL MOURA DE OLIVEIRA", "ANTONIO SAULO F ALMEIDA", "DAVI PINHEIRO MATIAS",
+                                  "EMANUELLY MARCELINO LOPES", "ERIC DE MEDEIROS CABRAL", "FRANCISCO ARTHUR S LIMA",
+                                  "JAMILY COSTA SALDANHA", "JOAO PEDRO G VASCONCELOS", "JOSUE GIRAO PAIXAO",
+                                  "MARIA ISABELLY C SILVA", "MARIA ISABELLY GOMES LIMA", "OSAIAS ALMEIDA CASTRO NT",
+                                  "PEDRO DE ALMEIDA AVELINO", "PEDRO LUCCA H RABELO", "REBECA ALVES FERREIRA"]
+
+    return beneficiarios_especificos

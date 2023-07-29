@@ -79,6 +79,9 @@
         tables.forEach(function (table) {
             var rows = table.rows;
 
+            var lastRowIndex = rows.length - 1;
+            rows[lastRowIndex].style.fontWeight = "bold";
+            
             // Center the text in table header cells (th)
             var headerRow = rows[0];
             var headerCells = headerRow.querySelectorAll("th");
@@ -89,8 +92,23 @@
             // Loop through all rows and center the text in table cells
             for (var i = 0; i < rows.length; i++) {
                 var cells = rows[i].querySelectorAll("td");
-                cells.forEach(function (cell) {
+                cells.forEach(function (cell, index) {
                     cell.style.textAlign = "center";
+
+                    if (index === 5) {
+                        // Get the cell text content and convert it to a numeric value
+                        var cellText = cell.textContent.trim().replace("R$ ", "").replace(",", "");
+                        var cellValue = parseFloat(cellText);
+
+                        // Check if the cell value is negative
+                        if (cellValue < 0) {
+                            cell.style.color = "red"; // Set the text color to red for negative values
+                            cell.style.fontWeight = "bold"; // Make the text bold for negative values
+                        } else if (cellValue > 0) {
+                            cell.style.color = "green"; // Set the text color to blue for positive values
+                            cell.style.fontWeight = "bold"; // Make the text bold for negative values
+                        }
+                    }
                 });
             }
             });

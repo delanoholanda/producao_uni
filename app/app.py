@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 # import pandas as pd
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
-from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados
+from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT
 from functions.create_dataframe import montarDataFrame
 
 
@@ -54,7 +54,10 @@ def index():
 
                 # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
 
-                df_exibir = filtroByCodigo2(df,codigo="5000510")
+                beneficiarios_AT = obter_beneficiarios_AT()
+
+                codigo = "5000510"
+                df_exibir = filtroByCodigo2(df, codigo, beneficiarios_AT)
 
                 DATAFRAME_INDEX = df_exibir
                 # DATAFRAME_INDEX = df
@@ -85,9 +88,10 @@ def filtro_at():
         return redirect(url_for('index',error_message=error_message), code=302) 
     
     beneficiarios_desejados = obter_beneficiarios_desejados(profissional)
-    
+    beneficiarios_AT = obter_beneficiarios_AT()
+
     codigo = "5000510"
-    df_exibir = filtroByAT(DATAFRAME_ORIGINAL, beneficiarios_desejados, codigo, profissional)
+    df_exibir = filtroByAT(DATAFRAME_ORIGINAL, beneficiarios_desejados, beneficiarios_AT, codigo, profissional)
 
     # Verificar se o DataFrame filtrado está vazio
     if df_exibir.empty:
