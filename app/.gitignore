@@ -2,4 +2,4 @@ config.py
 __pycache__/
 functions/__pycache__/
 .ipynb_checkpoints
-instance/database.db
+instance/
