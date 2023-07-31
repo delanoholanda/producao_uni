@@ -61,6 +61,8 @@
                                 </ul>
                             </div>
                             <a href="{{ url_for('index') }}?atualizar=True" class="btn waves-effect waves-light">Trocar PDF</a>
+                            <a href="{{ url_for('profissional') }}" class="btn waves-effect waves-light">Profissionais</a>
+                            <a href="{{ url_for('paciente') }}" class="btn waves-effect waves-light">Pacientes</a>
                         </div>
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         {{ table | safe }}
@@ -80,17 +82,9 @@
     <!-- Link Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    <!-- <script>
-        function updateSelectedAT(atName) {
-            const selectedATElement = document.getElementById('selectedAT');
-            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
-        }
-    </script> -->
+
     <script>
-        // function updateSelectedAT(atName) {
-        //     const selectedATElement = document.getElementById('selectedAT');
-        //     selectedATElement.textContent = `Produção da AT: ${atName}`;
-        // }
+        
 
         document.addEventListener("DOMContentLoaded", function () {
         var tables = document.querySelectorAll(".table-bordered");
@@ -113,14 +107,6 @@
                 cells.forEach(function (cell, index) {
                     cell.style.textAlign = "center";
 
-                    // // Check if the cell contains a negative value in the "Saldo Mãe" column
-                    // var cellText = cell.textContent.trim();
-                    // if (cellText.includes("R$ -")) {
-                    //     cell.style.color = "red"; // Set the text color to red for negative values
-                    //     cell.style.fontWeight = "bold"; // Make the text bold for negative values
-                    // }
-                    // Get the cell text content and convert it to a numeric value
-                    // Check if the cell is in the 6th column (index 5)
                     if (index === 6) {
                         // Get the cell text content and convert it to a numeric value
                         var cellText = cell.textContent.trim().replace("R$ ", "").replace(",", "");
@@ -142,49 +128,6 @@
 
     </script>
 
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var tables = document.querySelectorAll(".table-bordered tbody");
-            tables.forEach(function (table) {
-                var rows = table.rows;
-                var lastRowIndex = rows.length - 1;
-                rows[lastRowIndex].classList.add("font-weight-bold");
-            });
-        });
-    </script> -->
-
-    <!-- <script>
-        function updateSelectedAT(atName) {
-            const selectedATElement = document.getElementById('selectedAT');
-            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
-        }
-    </script>
-    <script>
-        function updateSelectedAT(atName) {
-            const selectedATElement = document.getElementById('selectedAT');
-            selectedATElement.textContent = `Filtro selecionado: ${atName}`;
-    
-            // Perform AJAX request to fetch the filtered data
-            fetch('/filter-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    atName: atName
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Update the table data with the fetched data
-                const tableContainer = document.getElementById('tableContainer');
-                tableContainer.innerHTML = data.html;
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-        }
-    </script> -->
 
 </body>
 </html>

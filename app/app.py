@@ -136,14 +136,14 @@ def profissional():
         db.session.add(novo_profissional)
         db.session.commit()
     profissionais = Profissional.query.all()
-    return render_template('profissional.html', profissionais=profissionais)
+    return render_template('profissional.html', profissionais=profissionais, producao=PRODUCAO)
 
 @app.route('/profissional/delete/<int:id>')
 def delete_profissional(id):
     profissional = Profissional.query.get_or_404(id)
     db.session.delete(profissional)
     db.session.commit()
-    return redirect(url_for('profissional'))
+    return redirect(url_for('profissional'), producao=PRODUCAO)
 
 # Rotas para CRUD de Paciente
 @app.route('/paciente', methods=['GET', 'POST'])
@@ -158,14 +158,14 @@ def paciente():
     profissionais = Profissional.query.all()
     for p in profissionais:
         print(p.nome)
-    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais)
+    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais, producao=PRODUCAO)
 
 @app.route('/paciente/delete/<int:id>')
 def delete_paciente(id):
     paciente = Paciente.query.get_or_404(id)
     db.session.delete(paciente)
     db.session.commit()
-    return redirect(url_for('paciente'))
+    return redirect(url_for('paciente'), producao=PRODUCAO)
 
 
 if __name__ == '__main__':
