@@ -67,16 +67,16 @@
                         </div>
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         <div class="container">
-                            <h1>Pacientes</h1>
+                            <h5>Adicionar Beneficiário</h5>
                             <div class="row">
                                 <form class="col s12" method="post">
                                     <div class="row">
                                         <div class="input-field col s6">
-                                            <input type="text" name="nome" id="nome" placeholder="Nome">
+                                            <input type="text" name="nome" id="nome" placeholder="Nome" required>
                                             <label for="nome">Nome</label>
                                         </div>
                                         <div class="input-field col s6">
-                                            <select name="profissional_id" id="profissional_id">
+                                            <select name="profissional_id" id="profissional_id" required>
                                                 <option value="" disabled selected>Selecione um profissional</option>
                                                 {% for profissional in profissionais %}
                                                 <option value="{{ profissional.id }}">{{ profissional.nome }}</option>
@@ -88,7 +88,7 @@
                                     <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
                                 </form>
                             </div>
-                            <table class="striped centered">
+                            <table class="striped centered table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>Beneficiário</th>
@@ -102,8 +102,11 @@
                                         <td>{{ paciente.nome }}</td>
                                         <td>{{ paciente.profissional.nome }}</td>
                                         <td>
+                                            <a href="{{ url_for('edit_paciente', id=paciente.id) }}" class="btn-small waves-effect waves-light blue">
+                                                <i class="material-icons">Editar</i>
+                                            </a>
                                             <a href="{{ url_for('delete_paciente', id=paciente.id) }}" class="btn-small waves-effect waves-light red">
-                                                <i class="material-icons">delete</i>
+                                                <i class="material-icons">Apagar</i>
                                             </a>
                                         </td>
                                     </tr>

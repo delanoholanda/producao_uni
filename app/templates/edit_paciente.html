@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Profissionais</title>
+    <title>Pacientes</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Link Materialize CSS -->
@@ -66,43 +67,20 @@
                         </div>
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         <div class="container">
-                            <h5>Adicionar Profissional</h5>
-                            <div class="row">
-                                <form class="col s12" method="post">
-                                    <div class="row">
-                                        <div class="input-field col s8">
-                                            <input type="text" name="nome" id="nome" placeholder="Nome" required>
-                                            <label for="nome">Nome</label>
-                                        </div>
-                                        <div class="col s4">
-                                            <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <table class="striped centered table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Profissional</th>
-                                        <th>Opções</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <h1>Editar Paciente</h1>
+                            <form method="post">
+                                <label for="nome">Nome:</label>
+                                <input type="text" name="nome" id="nome" value="{{ paciente.nome }}" required>
+                                <label for="profissional_id">Profissional:</label>
+                                <select name="profissional_id" id="profissional_id">
                                     {% for profissional in profissionais %}
-                                    <tr>
-                                        <td>{{ profissional.nome }}</td>
-                                        <td>
-                                            <a href="{{ url_for('edit_profissional', id=profissional.id) }}" class="btn-small waves-effect waves-light blue">
-                                                <i class="material-icons">Editar</i>
-                                            </a>
-                                            <a href="{{ url_for('delete_profissional', id=profissional.id) }}" class="btn-small waves-effect waves-light red">
-                                                <i class="material-icons">Apagar</i>
-                                            </a>
-                                        </td>
-                                    </tr>
+                                    <option value="{{ profissional.id }}" {% if profissional.id == paciente.profissional_id %}selected{% endif %}>{{ profissional.nome }}</option>
                                     {% endfor %}
-                                </tbody>
-                            </table>
+                                </select>
+                                <button type="submit">Salvar</button>
+                            </form>
+                            <a href="{{ url_for('paciente') }}">Cancelar</a>
+                            
                         </div>
                         
                         <!-- <p class="text-center">{{ semDados }}</p> -->
@@ -114,8 +92,19 @@
             </div>
         </div>
     </div>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Link Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Inicializar o elemento select do Materialize
+        $(document).ready(function(){
+            $('select').formSelect();
+        });
+    </script>
+
+</body>
+</html>

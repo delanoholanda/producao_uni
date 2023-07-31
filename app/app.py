@@ -136,14 +136,31 @@ def profissional():
         db.session.add(novo_profissional)
         db.session.commit()
     profissionais = Profissional.query.all()
-    return render_template('profissional.html', profissionais=profissionais, producao=PRODUCAO)
+    return render_template('profissional.html', profissionais=profissionais)
 
 @app.route('/profissional/delete/<int:id>')
 def delete_profissional(id):
     profissional = Profissional.query.get_or_404(id)
     db.session.delete(profissional)
     db.session.commit()
-    return redirect(url_for('profissional'), producao=PRODUCAO)
+    return redirect(url_for('profissional'))
+
+
+# Rota para renderizar o formulário de edição do Profissional
+@app.route('/profissional/edit/<int:id>', methods=['GET'])
+def edit_profissional(id):
+    profissional = Profissional.query.get_or_404(id)
+    return render_template('edit_profissional.html', profissional=profissional)
+
+# Rota para processar a submissão do formulário de edição do Profissional
+@app.route('/profissional/edit/<int:id>', methods=['POST'])
+def update_profissional(id):
+    profissional = Profissional.query.get_or_404(id)
+    profissional.nome = request.form['nome']
+    db.session.commit()
+    return redirect(url_for('profissional'))
+
+
 
 # Rotas para CRUD de Paciente
 @app.route('/paciente', methods=['GET', 'POST'])
@@ -156,16 +173,31 @@ def paciente():
         db.session.commit()
     pacientes = Paciente.query.all()
     profissionais = Profissional.query.all()
-    for p in profissionais:
-        print(p.nome)
-    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais, producao=PRODUCAO)
+    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais)
 
 @app.route('/paciente/delete/<int:id>')
 def delete_paciente(id):
     paciente = Paciente.query.get_or_404(id)
     db.session.delete(paciente)
     db.session.commit()
-    return redirect(url_for('paciente'), producao=PRODUCAO)
+    return redirect(url_for('paciente'))
+
+
+# Rota para renderizar o formulário de edição do Paciente
+@app.route('/paciente/edit/<int:id>', methods=['GET'])
+def edit_paciente(id):
+    paciente = Paciente.query.get_or_404(id)
+    profissionais = Profissional.query.all()
+    return render_template('edit_paciente.html', paciente=paciente, profissionais=profissionais)
+
+# Rota para processar a submissão do formulário de edição do Paciente
+@app.route('/paciente/edit/<int:id>', methods=['POST'])
+def update_paciente(id):
+    paciente = Paciente.query.get_or_404(id)
+    paciente.nome = request.form['nome']
+    paciente.profissional_id = request.form['profissional_id']
+    db.session.commit()
+    return redirect(url_for('paciente'))
 
 
 if __name__ == '__main__':
