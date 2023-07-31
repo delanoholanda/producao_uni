@@ -237,7 +237,7 @@ def filtroByCodigo2(dataFrame, codigo, beneficiarios_especificos):
 def filtroByAT(dataFrame, beneficiarios_desejados, beneficiarios_especificos, codigo, profissional):
     
     # Lista de beneficiários específicos
-    beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
+    # beneficiarios_especificos = ["CECILIA PEREIRA MACHADO", "JOAO MIGUEL PARENTE GOMES"]
 
     # Selecione apenas as linhas com o código "5000510"
     df_codigo = dataFrame[dataFrame['Código'] == codigo]
@@ -287,7 +287,8 @@ def filtroByAT(dataFrame, beneficiarios_desejados, beneficiarios_especificos, co
             # Alterar os valores na coluna "Quantas vezes Passou"
             contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ"]), "Quantidade"] /= 2
             
-
+        elif profissional == "Gabriela":
+            contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["ARTHUR MIGUEL C QUEIROZ", "CARLOS HENRIK O BATISTA"]), "Quantidade"] /= 2
             # # Alterar os valores na coluna "Quantas vezes Passou"
             # contagem_ocorrencias.loc[contagem_ocorrencias["Beneficiário"].isin(["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO"]), "Quantidade"] /= 2
 
@@ -414,7 +415,7 @@ def obter_beneficiarios_desejados(profissional):
             "ALVARO WESLEY SILVA LEMOS", "FRANCISCO RAFAEL P SILVA", "ISIS MARIA DANTAS SOARES",
             "JOAO ERNANDO LOPES LIMA", "JOAO MIGUEL N DE ASSIS", "MANUEL IDEFONSO DA CUNHA",
             "MARIA ISABELLY GOMES LIMA", "NOAH OLIVEIRA RODRIGUES", "OSAIAS ALMEIDA CASTRO NT",
-            "WILLIAM LEVY C DE BRITO", "YAN WEVERTON BATISTA MELO"]
+            "WILLIAM LEVY C DE BRITO", "YAN WEVERTON BATISTA MELO", "ARTHUR MIGUEL C QUEIROZ"]
     elif profissional == "Joana":
         beneficiarios_desejados = [
             "ANTONIO SAULO F ALMEIDA", "JAMILY COSTA SALDANHA", "PEDRO DE ALMEIDA AVELINO"]
@@ -427,13 +428,17 @@ def obter_beneficiarios_desejados(profissional):
     elif profissional == "Alice":
         beneficiarios_desejados = ["JOAO PEDRO G VASCONCELOS"]
     elif profissional == "Quintina":
-        beneficiarios_desejados = ["ANGEL MOURA DE OLIVEIRA"]
+        beneficiarios_desejados = ["ANGEL MOURA DE OLIVEIRA", "ERIC DE MEDEIROS CABRAL"]
     elif profissional == "Talya":
-        beneficiarios_desejados = ["REBECA ALVES FERREIRA"]
+        beneficiarios_desejados = ["REBECA ALVES FERREIRA", "FRANCISCO ARTHUR S LIMA"]
     elif profissional == "Wytala":
         beneficiarios_desejados = ["PEDRO LUCCA H RABELO", "JOSUE GIRAO PAIXAO"]
     elif profissional == "Thalya":
         beneficiarios_desejados = ["FRANCISCO ARTHUR S LIMA"]
+    elif profissional == "Geane":
+        beneficiarios_desejados = ["DAVI PINHEIRO MATIAS"]
+    elif profissional == "Olinea":
+        beneficiarios_desejados = ["ADRIAN LEVI COSTA AQUINO"]
     elif profissional == "Jaqueline":
         beneficiarios_desejados = ["EMANUELLY MARCELINO LOPES"]
     else:
