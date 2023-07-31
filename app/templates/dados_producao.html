@@ -40,9 +40,24 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <!-- Add your dropdown menu items here -->
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Alice" onclick="updateSelectedAT('Alice')">Alice</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Darlene" onclick="updateSelectedAT('Darlene')">Darlene</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Davylla" onclick="updateSelectedAT('Davylla')">Davylla</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Elizza" onclick="updateSelectedAT('Elizza')">Elizza</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Gabriela" onclick="updateSelectedAT('Elizza')">Gabriela</a></li>
-                                    <li><a class="dropdown-item" href="#">Cicrana</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Gabriela" onclick="updateSelectedAT('Gabriela')">Gabriela</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Geane" onclick="updateSelectedAT('Geane')">Geane</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Ivana" onclick="updateSelectedAT('Ivana')">Ivana</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jaqueline" onclick="updateSelectedAT('Jaqueline')">Jaqueline</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jayanne" onclick="updateSelectedAT('Jayanne')">Jayanne</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Joana" onclick="updateSelectedAT('Joanna')">Joanna</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jô" onclick="updateSelectedAT('Jô')">Jô</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Mariana" onclick="updateSelectedAT('Mariana')">Mariana</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Mariane" onclick="updateSelectedAT('Mariane')">Mariane</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Olinea" onclick="updateSelectedAT('Olinea')">Olinea</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Quintina" onclick="updateSelectedAT('Quintina')">Quintina</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Simone" onclick="updateSelectedAT('Simone')">Simone</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Thalia" onclick="updateSelectedAT('Thalia')">Thalia</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Wytalla" onclick="updateSelectedAT('Wytalla')">Wytalla</a></li>
                                 </ul>
                             </div>
                             <a href="{{ url_for('index') }}?atualizar=True" class="btn waves-effect waves-light">Trocar PDF</a>
@@ -95,7 +110,7 @@
                 cells.forEach(function (cell, index) {
                     cell.style.textAlign = "center";
 
-                    if (index === 5) {
+                    if (index === 6) {
                         // Get the cell text content and convert it to a numeric value
                         var cellText = cell.textContent.trim().replace("R$ ", "").replace(",", "");
                         var cellValue = parseFloat(cellText);
