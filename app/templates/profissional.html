@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profissionais</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Profissionais</h1>
+        <div class="row">
+            <form class="col s12" method="post">
+                <div class="row">
+                    <div class="input-field col s8">
+                        <input type="text" name="nome" id="nome" placeholder="Nome">
+                        <label for="nome">Nome</label>
+                    </div>
+                    <div class="col s4">
+                        <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <ul class="collection">
+            {% for profissional in profissionais %}
+            <li class="collection-item">
+                {{ profissional.nome }}
+                <a href="{{ url_for('delete_profissional', id=profissional.id) }}" class="secondary-content">
+                    <i class="material-icons">delete</i>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>

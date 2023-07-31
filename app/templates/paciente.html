@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pacientes</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pacientes</h1>
+        <div class="row">
+            <form class="col s12" method="post">
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="text" name="nome" id="nome" placeholder="Nome">
+                        <label for="nome">Nome</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <select name="profissional_id" id="profissional_id">
+                            <option value="" disabled selected>Selecione um profissional</option>
+                            {% for profissional in profissionais %}
+                            <option value="{{ profissional.id }}">{{ profissional.nome }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="profissional_id">Profissional</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
+            </form>
+        </div>
+        <ul class="collection">
+            {% for paciente in pacientes %}
+            <li class="collection-item">
+                {{ paciente.nome }} - {{ paciente.profissional.nome }}
+                <a href="{{ url_for('delete_paciente', id=paciente.id) }}" class="secondary-content">
+                    <i class="material-icons">delete</i>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // Inicializar o elemento select do Materialize
+        $(document).ready(function(){
+            $('select').formSelect();
+        });
+    </script>
+</body>
+</html>

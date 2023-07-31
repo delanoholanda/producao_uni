@@ -3,6 +3,7 @@
 import tempfile
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from models import db, Profissional, Paciente
 # import pandas as pd
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
@@ -11,6 +12,16 @@ from functions.create_dataframe import montarDataFrame
 
 
 app = Flask(__name__)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Usando banco de dados SQLite
+
+# Inicializa o objeto 'db' com o aplicativo Flask
+db.init_app(app)
+
+# Cria o banco de dados
+with app.app_context():
+    db.create_all()
 
 
 DATAFRAME_ORIGINAL = None
@@ -116,6 +127,45 @@ def all_dados():
     return render_template('result.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped'))
 
 
+# Rotas para CRUD de Profissional
+@app.route('/profissional', methods=['GET', 'POST'])
+def profissional():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        novo_profissional = Profissional(nome=nome)
+        db.session.add(novo_profissional)
+        db.session.commit()
+    profissionais = Profissional.query.all()
+    return render_template('profissional.html', profissionais=profissionais)
+
+@app.route('/profissional/delete/<int:id>')
+def delete_profissional(id):
+    profissional = Profissional.query.get_or_404(id)
+    db.session.delete(profissional)
+    db.session.commit()
+    return redirect(url_for('profissional'))
+
+# Rotas para CRUD de Paciente
+@app.route('/paciente', methods=['GET', 'POST'])
+def paciente():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        profissional_id = request.form['profissional_id']
+        novo_paciente = Paciente(nome=nome, profissional_id=profissional_id)
+        db.session.add(novo_paciente)
+        db.session.commit()
+    pacientes = Paciente.query.all()
+    profissionais = Profissional.query.all()
+    for p in profissionais:
+        print(p.nome)
+    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais)
+
+@app.route('/paciente/delete/<int:id>')
+def delete_paciente(id):
+    paciente = Paciente.query.get_or_404(id)
+    db.session.delete(paciente)
+    db.session.commit()
+    return redirect(url_for('paciente'))
 
 
 if __name__ == '__main__':
