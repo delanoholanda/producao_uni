@@ -114,6 +114,24 @@ def filtro_at():
         # return jsonify({'html': df_html})
 
 
+@app.route('/producao_data_hora', methods=['GET'])
+def producao_data_hora():
+
+
+    global DATAFRAME_ORIGINAL
+    if DATAFRAME_ORIGINAL is None:
+        error_message = "Necessário adicionar um PDF"
+        return redirect(url_for('index',error_message=error_message), code=302)
+
+
+    df_exibir = DATAFRAME_ORIGINAL
+
+    # return render_template('producao_data_hora.html', df_exibir=df_exibir, producao=PRODUCAO)
+    return render_template('producao_data_hora.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False), producao=PRODUCAO)
+
+    # return jsonify({'html': df_html})
+
+
 @app.route('/all_dados', methods=['GET'])
 def all_dados():
     global DATAFRAME_INDEX

@@ -32,39 +32,9 @@
                         <h3 class="text-center">Produção Unimed - {{producao}}</h3>
                     </div>
                     <div class="card-body">
-                        <!-- Barra de botões com o novo CSS -->
-                        <div class="custom-btn-group btn-group">
-                            <a href="{{ url_for('index') }}" class="btn waves-effect waves-light">Home</a>
-                            <div class="btn-group">
-                                <button type="button" class="btn waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown">
-                                    Filtrar por AT
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <!-- Add your dropdown menu items here -->
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Alice" onclick="updateSelectedAT('Alice')">Alice</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Darlene" onclick="updateSelectedAT('Darlene')">Darlene</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Davylla" onclick="updateSelectedAT('Davylla')">Davylla</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Elizza" onclick="updateSelectedAT('Elizza')">Elizza</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Gabriela" onclick="updateSelectedAT('Gabriela')">Gabriela</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Geane" onclick="updateSelectedAT('Geane')">Geane</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Ivana" onclick="updateSelectedAT('Ivana')">Ivana</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jaqueline" onclick="updateSelectedAT('Jaqueline')">Jaqueline</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jayanne" onclick="updateSelectedAT('Jayanne')">Jayanne</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Joana" onclick="updateSelectedAT('Joanna')">Joanna</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Jô" onclick="updateSelectedAT('Jô')">Jô</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Mariana" onclick="updateSelectedAT('Mariana')">Mariana</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Mariane" onclick="updateSelectedAT('Mariane')">Mariane</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Olinea" onclick="updateSelectedAT('Olinea')">Olinea</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Quintina" onclick="updateSelectedAT('Quintina')">Quintina</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Simone" onclick="updateSelectedAT('Simone')">Simone</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Thalia" onclick="updateSelectedAT('Thalia')">Thalia</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('filtro_at')}}?at=Wytalla" onclick="updateSelectedAT('Wytalla')">Wytalla</a></li>
-                                </ul>
-                            </div>
-                            <a href="{{ url_for('index') }}?atualizar=True" class="btn waves-effect waves-light">Trocar PDF</a>
-                            <a href="{{ url_for('profissional') }}" class="btn waves-effect waves-light">Profissionais</a>
-                            <a href="{{ url_for('paciente') }}" class="btn waves-effect waves-light">Pacientes</a>
-                        </div>
+                        <!-- Adicionando o Menu -->
+                        {% include 'menu.html' %}
+                        <!-- Adicionando o Menu -->
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         <div class="container">
                             <h1>Editar Paciente</h1>
