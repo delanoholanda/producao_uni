@@ -126,8 +126,14 @@ def producao_data_hora():
 
     df_exibir = DATAFRAME_ORIGINAL
 
+    # Remover a coluna 'Lote'
+    df_exibir = df_exibir.drop('Lote', axis=1)
+
+     # Selecione apenas as linhas com o código "5000510"
+    df_codigo = df_exibir[df_exibir['Código'] == "5000510"]
+
     # return render_template('producao_data_hora.html', df_exibir=df_exibir, producao=PRODUCAO)
-    return render_template('producao_data_hora.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False), producao=PRODUCAO)
+    return render_template('producao_data_hora.html', table=df_codigo.to_html(classes='table table-bordered table-striped', index=False), producao=PRODUCAO)
 
     # return jsonify({'html': df_html})
 

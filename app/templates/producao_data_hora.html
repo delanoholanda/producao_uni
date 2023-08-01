@@ -81,7 +81,7 @@
     
             // Obtém os Beneficiários únicos da tabela
             tableRows.forEach(function (row) {
-                var beneficiary = row.cells[3].textContent.trim();
+                var beneficiary = row.cells[2].textContent.trim();
                 beneficiaries.add(beneficiary);
             });
     
@@ -110,7 +110,7 @@
             } else {
                 // Ocultar linhas que não correspondam ao Beneficiário selecionado
                 tableRows.forEach(function (row) {
-                    var beneficiaryCell = row.cells[3].textContent.trim();
+                    var beneficiaryCell = row.cells[2].textContent.trim();
                     if (beneficiaryCell !== selectedBeneficiary) {
                         row.style.display = 'none';
                     } else {
