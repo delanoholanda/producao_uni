@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>Pacientes</title>
+    <title>Beneficiarios</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Link Materialize CSS -->
@@ -37,19 +37,19 @@
                         <!-- Adicionando o Menu -->
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         <div class="container">
-                            <h1>Editar Paciente</h1>
+                            <h1>Editar Beneficiario</h1>
                             <form method="post">
                                 <label for="nome">Nome:</label>
-                                <input type="text" name="nome" id="nome" value="{{ paciente.nome }}" required>
+                                <input type="text" name="nome" id="nome" value="{{ beneficiario.nome }}" required>
                                 <label for="profissional_id">Profissional:</label>
                                 <select name="profissional_id" id="profissional_id">
                                     {% for profissional in profissionais %}
-                                    <option value="{{ profissional.id }}" {% if profissional.id == paciente.profissional_id %}selected{% endif %}>{{ profissional.nome }}</option>
+                                    <option value="{{ profissional.id }}" {% if profissional.id == beneficiario.profissional_id %}selected{% endif %}>{{ profissional.nome }}</option>
                                     {% endfor %}
                                 </select>
                                 <button type="submit">Salvar</button>
                             </form>
-                            <a href="{{ url_for('paciente') }}">Cancelar</a>
+                            <a href="{{ url_for('beneficiario') }}">Cancelar</a>
                             
                         </div>
                         

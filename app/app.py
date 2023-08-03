@@ -3,8 +3,8 @@
 import tempfile
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from models import db, Profissional, Paciente
-# import pandas as pd
+from models import db, Profissional, Beneficiario, Producao, DadosProducao
+import pandas as pd
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
 from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT
@@ -13,8 +13,18 @@ from functions.create_dataframe import montarDataFrame
 
 app = Flask(__name__)
 
+# Especifica o caminho completo para a pasta "data" no diretório do projeto
+data_folder = os.path.join(os.path.dirname(__file__), 'data')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Usando banco de dados SQLite
+# Garante que a pasta "data" exista, caso contrário, cria-a
+os.makedirs(data_folder, exist_ok=True)
+
+# Especifica o caminho completo para o arquivo do banco de dados dentro da pasta "data"
+db_path = os.path.join(data_folder, 'database.db')
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'  # Usando banco de dados SQLite
+
 
 # Inicializa o objeto 'db' com o aplicativo Flask
 db.init_app(app)
@@ -55,9 +65,43 @@ def index():
                 df = montarDataFrame(lista_diferentes_codigos, texto_processado)
             
 
-                    
-
                 PRODUCAO = linha_producao_movimento.group()
+
+                producao_movimetacao = PRODUCAO
+                # Verificar se a produção já existe com o mesmo valor em producao_movimetacao
+                producao_existente = Producao.query.filter_by(producao_movimetacao=producao_movimetacao).first()
+
+                if producao_existente is None:
+                    # Criar a nova produção apenas se não existir
+                    nova_producao = Producao(producao_movimetacao=producao_movimetacao)
+                    db.session.add(nova_producao)
+                    db.session.commit()
+
+                    # Supondo que você tenha um DataFrame "dados" com os dados a serem adicionados à tabela "DadosProducao"
+                    dados = df
+
+                    # Convert 'Qtd.Paga' and 'Valor' columns to numeric types
+                    dados['Qtd.Paga'] = dados['Qtd.Paga'].str.replace(',', '.').astype(float)
+                    dados['Valor'] = dados['Valor'].str.replace(',', '.').astype(float)
+
+                    # Convert 'Data-Hora' to datetime format
+                    dados['Data-Hora'] = pd.to_datetime(dados['Data-Hora'], format='%d/%m/%Y %H:%M:%S')                    
+
+                    for _, row in dados.iterrows():
+                        nova_dados_producao = DadosProducao(
+                            lote=row['Lote'],
+                            data_hora=pd.to_datetime(row['Data-Hora']),
+                            codigo=row['Código'],
+                            beneficiario=row['Beneficiário'],
+                            qtd_paga=row['Qtd.Paga'],
+                            valor=row['Valor'],
+                            producao_id=nova_producao.id  # Associar a linha de dados à produção recém-criada
+                        ) #  Lote,  Data-Hora , Código,  Beneficiario,  Qtd.Paga  e  Valor
+                        db.session.add(nova_dados_producao)
+                    
+                    db.session.commit()
+                
+
                 DATAFRAME_ORIGINAL = df
 
                 # Remove the temporary file after processing
@@ -72,9 +116,9 @@ def index():
 
                 DATAFRAME_INDEX = df_exibir
                 # DATAFRAME_INDEX = df
-                
+                    
 
-                # return render_template('dados_producao.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped', index=False))
+                    # return render_template('dados_producao.html', table=DATAFRAME_INDEX.to_html(classes='table table-bordered table-striped', index=False))
                 return render_template('dados_producao.html', table=df_exibir.to_html(classes='table table-bordered table-striped', index=False), producao=PRODUCAO)
             else:
                 error_message = "PDF Inválido!"
@@ -186,42 +230,79 @@ def update_profissional(id):
 
 
 
-# Rotas para CRUD de Paciente
-@app.route('/paciente', methods=['GET', 'POST'])
-def paciente():
+# Rotas para CRUD de Beneficiario
+@app.route('/beneficiario', methods=['GET', 'POST'])
+def beneficiario():
     if request.method == 'POST':
         nome = request.form['nome']
         profissional_id = request.form['profissional_id']
-        novo_paciente = Paciente(nome=nome, profissional_id=profissional_id)
-        db.session.add(novo_paciente)
+        novo_beneficiario = Beneficiario(nome=nome, profissional_id=profissional_id)
+        db.session.add(novo_beneficiario)
         db.session.commit()
-    pacientes = Paciente.query.all()
+    beneficiarios = Beneficiario.query.all()
     profissionais = Profissional.query.all()
-    return render_template('paciente.html', pacientes=pacientes, profissionais=profissionais)
+    return render_template('beneficiario.html', beneficiarios=beneficiarios, profissionais=profissionais)
 
-@app.route('/paciente/delete/<int:id>')
-def delete_paciente(id):
-    paciente = Paciente.query.get_or_404(id)
-    db.session.delete(paciente)
+@app.route('/beneficiario/delete/<int:id>')
+def delete_beneficiario(id):
+    beneficiario = Beneficiario.query.get_or_404(id)
+    db.session.delete(beneficiario)
     db.session.commit()
-    return redirect(url_for('paciente'))
+    return redirect(url_for('beneficiario'))
 
 
-# Rota para renderizar o formulário de edição do Paciente
-@app.route('/paciente/edit/<int:id>', methods=['GET'])
-def edit_paciente(id):
-    paciente = Paciente.query.get_or_404(id)
+# Rota para renderizar o formulário de edição do Beneficiario
+@app.route('/beneficiario/edit/<int:id>', methods=['GET'])
+def edit_beneficiario(id):
+    beneficiario = Beneficiario.query.get_or_404(id)
     profissionais = Profissional.query.all()
-    return render_template('edit_paciente.html', paciente=paciente, profissionais=profissionais)
+    return render_template('edit_beneficiario.html', beneficiario=beneficiario, profissionais=profissionais)
 
-# Rota para processar a submissão do formulário de edição do Paciente
-@app.route('/paciente/edit/<int:id>', methods=['POST'])
-def update_paciente(id):
-    paciente = Paciente.query.get_or_404(id)
-    paciente.nome = request.form['nome']
-    paciente.profissional_id = request.form['profissional_id']
+# Rota para processar a submissão do formulário de edição do Beneficiario
+@app.route('/beneficiario/edit/<int:id>', methods=['POST'])
+def update_beneficiario(id):
+    beneficiario = Beneficiario.query.get_or_404(id)
+    beneficiario.nome = request.form['nome']
+    beneficiario.profissional_id = request.form['profissional_id']
     db.session.commit()
-    return redirect(url_for('paciente'))
+    return redirect(url_for('beneficiario'))
+
+
+# Route to display the existing productions in the HTML template
+@app.route('/show_producoes')
+def show_producoes():
+    producoes = Producao.query.all()
+    return render_template('show_producoes.html', producoes=producoes)
+
+
+# Route to display the data for a specific production
+@app.route('/todos_dados_producao/<int:producao_id>')
+def todos_dados_producao(producao_id):
+    producao = Producao.query.get(producao_id)
+    if producao is None:
+        return "Production not found."
+    else:        
+        return render_template('todos_dados_producao.html', producao=producao)
+
+# # Rotas para CRUD de Producao
+# @app.route('/beneficiario', methods=['GET', 'POST'])
+# def beneficiario():
+#     if request.method == 'POST':
+#         nome = request.form['nome']
+#         profissional_id = request.form['profissional_id']
+#         novo_beneficiario = Beneficiario(nome=nome, profissional_id=profissional_id)
+#         db.session.add(novo_beneficiario)
+#         db.session.commit()
+#     beneficiarios = Beneficiario.query.all()
+#     profissionais = Profissional.query.all()
+#     return render_template('beneficiario.html', beneficiarios=beneficiarios, profissionais=profissionais)
+
+# @app.route('/beneficiario/delete/<int:id>')
+# def delete_beneficiario(id):
+#     beneficiario = Beneficiario.query.get_or_404(id)
+#     db.session.delete(beneficiario)
+#     db.session.commit()
+#     return redirect(url_for('beneficiario'))
 
 
 if __name__ == '__main__':
