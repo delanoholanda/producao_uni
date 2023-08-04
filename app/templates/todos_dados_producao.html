@@ -35,323 +35,57 @@
                         <!-- Adicionando o Menu -->
                         {% include 'menu.html' %}
                         <!-- Adicionando o Menu -->
-                            <h5 class="text-center">Dados da Produção - {{ producao.producao_movimetacao  }}</h5>
-                            <div class="custom-btn-group btn-group">
-                                <!-- ... (existing buttons) ... -->
-                                <div class="btn-group">
-                                    <select id="beneficiarySelect" class="btn  waves-effect waves-light dropdown-toggle">
-                                        <option value="">Todos os Beneficiários</option>
-                                    </select>
-                                </div>
-                                <div class="btn-group">
-                                    <select id="codeSelect" class="btn waves-effect waves-light dropdown-toggle">
-                                        <option value="">Todos os Códigos</option>
-                                    </select>
-                                </div>
-                                
-                                
-                                
-                                <!--  funciona com fundo branco <div class="btn-group">
-                                    <button type="button" class="btn blue waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown">
-                                        Selecionar Beneficiário
-                                    </button>
-                                    <ul class="dropdown-menu" id="beneficiarySelect">
-                                        <-- Opção padrão de "Todos os Beneficiários" --
-                                        <li><a class="dropdown-item" href="#" onclick="filterBeneficiary('')">Todos os Beneficiários</a></li>
-                                    </ul>
-                                </div> -->
-                            
-                            </div>  
-                            <table class="mt-3 striped centered table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <!-- <th>Lote</th> -->
-                                        <th>Data-Hora</th>
-                                        <th>Código</th>
-                                        <th>Beneficiário</th>
-                                        <th>Qtd.Paga</th>
-                                        <th>Valor</th>
-                                    </tr>
-                                </thead>
-                                <!-- <tr id="noDataMessageRow" style="display: none;">
-                                    <td colspan="5" class="text-center">Nenhum dado encontrado</td>
-                                </tr> -->
-                                <tbody>
-                                    {% for dado in producao.dados_producao %}
-                                    <tr>
-                                        <!-- <td>{{ dado.lote }}</td> -->
-                                        <td>{{ dado.data_hora }}</td>
-                                        <td>{{ dado.codigo }}</td>
-                                        <td>{{ dado.beneficiario }}</td>
-                                        <td>{{ dado.qtd_paga }}</td>
-                                        <td>{{ dado.valor }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            <div id="noDataMessageRow" style="display: none;">
-                                <h6 colspan="5" class="text-center">Nenhum dado encontrado</h6>
+                        <h5 class="text-center">Dados da Produção - {{ producao.producao_movimetacao }}</h5>
+                        <div class="custom-btn-group btn-group">
+                            <!-- ... (existing buttons) ... -->
+                            <div class="btn-group">
+                                <select id="beneficiarySelect" class="btn  waves-effect waves-light dropdown-toggle">
+                                    <option value="">Todos os Beneficiários</option>
+                                </select>
+                            </div>
+                            <div class="btn-group">
+                                <select id="codeSelect" class="btn waves-effect waves-light dropdown-toggle">
+                                    <option value="">Todos os Códigos</option>
+                                </select>
                             </div>
                         </div>
-
-                        <!-- <p class="text-center">{{ semDados }}</p> -->
+                        <table class="mt-3 striped centered table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Data-Hora</th>
+                                    <th>Código</th>
+                                    <th>Beneficiário</th>
+                                    <th>Qtd.Paga</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dado in producao.dados_producao %}
+                                <tr>
+                                    <td>{{ dado.formatted_data_hora }}</td>
+                                    <td>{{ dado.codigo }}</td>
+                                    <td>{{ dado.beneficiario }}</td>
+                                    <td>{{ dado.qtd_paga }}</td>
+                                    <td>{{ dado.valor }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div id="noDataMessageRow" style="display: none;">
+                            <h6 colspan="5" class="text-center">Nenhum dado encontrado</h6>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Link Materialize JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-    <!-- Include the JavaScript file with the filter script -->
-    <script src="../js/filtroDadosProducao.js"></script>
+</body>
 
 
-    <!-- <script>
-        // Função para popular o select com os Beneficiários únicos da tabela
-        document.addEventListener("DOMContentLoaded", function () {
-            var beneficiarySelect = document.getElementById('beneficiarySelect');
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-            var beneficiaries = new Set();
-    
-            // Obtém os Beneficiários únicos da tabela
-            tableRows.forEach(function (row) {
-                var beneficiary = row.cells[2].textContent.trim();
-                beneficiaries.add(beneficiary);
-            });
-    
-            // Ordena os Beneficiários em ordem alfabética
-            var sortedBeneficiaries = Array.from(beneficiaries).sort();
+<!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Link Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-            // Popula o select com as opções dos Beneficiários únicos
-            sortedBeneficiaries.forEach(function (beneficiary) {
-                var option = document.createElement("option");
-                option.value = beneficiary;
-                option.textContent = beneficiary;
-                beneficiarySelect.appendChild(option);
-            });
-        });
-    
-        // Função para manipular o filtro de Beneficiários
-        document.getElementById('beneficiarySelect').addEventListener('change', function () {
-            var selectedBeneficiary = this.value;
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-    
-            // Mostrar todas as linhas se nenhum Beneficiário for selecionado
-            if (selectedBeneficiary === '') {
-                tableRows.forEach(function (row) {
-                    row.style.display = 'table-row';
-                });
-            } else {
-                // Ocultar linhas que não correspondam ao Beneficiário selecionado
-                tableRows.forEach(function (row) {
-                    var beneficiaryCell = row.cells[2].textContent.trim();
-                    if (beneficiaryCell !== selectedBeneficiary) {
-                        row.style.display = 'none';
-                    } else {
-                        row.style.display = 'table-row';
-                    }
-                });
-            }
-        });       
-    </script>
-    <script>
-        // Function to populate the select with unique Codes from the table
-        document.addEventListener("DOMContentLoaded", function () {
-            var codeSelect = document.getElementById('codeSelect');
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-            var codes = new Set();
-    
-            // Get the unique Codes from the table
-            tableRows.forEach(function (row) {
-                var code = row.cells[1].textContent.trim(); // Assuming the Code is in the second column (index 1)
-                codes.add(code);
-            });
-    
-            // Sort the Codes in ascending order
-            var sortedCodes = Array.from(codes).sort();
-    
-            // Populate the select with the unique Code options
-            sortedCodes.forEach(function (code) {
-                var option = document.createElement("option");
-                option.value = code;
-                option.textContent = code;
-                codeSelect.appendChild(option);
-            });
-        });
-    
-        // Function to handle the Code filter
-        document.getElementById('codeSelect').addEventListener('change', function () {
-            var selectedCode = this.value;
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-    
-            // Show all rows if no Code is selected
-            if (selectedCode === '') {
-                tableRows.forEach(function (row) {
-                    row.style.display = 'table-row';
-                });
-            } else {
-                // Hide rows that do not match the selected Code
-                tableRows.forEach(function (row) {
-                    var codeCell = row.cells[1].textContent.trim(); // Assuming the Code is in the second column (index 1)
-                    if (codeCell !== selectedCode) {
-                        row.style.display = 'none';
-                    } else {
-                        row.style.display = 'table-row';
-                    }
-                });
-            }
-        });
-    </script> -->
-    
-    <script>
-        // Function to populate the select with unique Beneficiaries from the table
-        function populateBeneficiarySelect() {
-            var beneficiarySelect = document.getElementById('beneficiarySelect');
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-            var beneficiaries = new Set();
-    
-            // Get the unique Beneficiaries from the table
-            tableRows.forEach(function (row) {
-                var beneficiary = row.cells[2].textContent.trim(); // Assuming the Beneficiary is in the third column (index 2)
-                beneficiaries.add(beneficiary);
-            });
-    
-            // Sort the Beneficiaries in ascending order
-            var sortedBeneficiaries = Array.from(beneficiaries).sort();
-    
-            // Populate the select with the unique Beneficiary options
-            beneficiarySelect.innerHTML = '<option value="">Todos os Beneficiários</option>'; // Reset the select options
-            sortedBeneficiaries.forEach(function (beneficiary) {
-                var option = document.createElement("option");
-                option.value = beneficiary;
-                option.textContent = beneficiary;
-                beneficiarySelect.appendChild(option);
-            });
-        }
-    
-        // Function to handle the Beneficiary filter
-        function handleBeneficiaryFilter() {
-            filterTable();
-        }
-    
-        // Function to populate the select with unique Codes from the table
-        function populateCodeSelect() {
-            var codeSelect = document.getElementById('codeSelect');
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-            var codes = new Set();
-    
-            // Get the unique Codes from the table
-            tableRows.forEach(function (row) {
-                var code = row.cells[1].textContent.trim(); // Assuming the Code is in the second column (index 1)
-                codes.add(code);
-            });
-    
-            // Sort the Codes in ascending order
-            var sortedCodes = Array.from(codes).sort();
-    
-            // Populate the select with the unique Code options
-            codeSelect.innerHTML = '<option value="">Todos os Códigos</option>'; // Reset the select options
-            sortedCodes.forEach(function (code) {
-                var option = document.createElement("option");
-                option.value = code;
-                option.textContent = code;
-                codeSelect.appendChild(option);
-            });
-        }
-    
-        // Function to handle the Code filter
-        function handleCodeFilter() {
-            filterTable();
-        }
-    
-        // Function to filter the table rows based on both Beneficiary and Code selections
-        function filterTable() {
-            var selectedBeneficiary = document.getElementById('beneficiarySelect').value;
-            var selectedCode = document.getElementById('codeSelect').value;
-            var tableRows = document.querySelectorAll('.table-bordered tbody tr');
-            var noDataMessageRow = document.getElementById('noDataMessageRow');
-
-            var hasMatchingRows = false;
-    
-            tableRows.forEach(function (row) {
-                var beneficiaryCell = row.cells[2].textContent.trim(); // Assuming the Beneficiary is in the third column (index 2)
-                var codeCell = row.cells[1].textContent.trim(); // Assuming the Code is in the second column (index 1)
-                var displayRow = true;
-                
-    
-                if (selectedBeneficiary !== '' && beneficiaryCell !== selectedBeneficiary) {
-                    displayRow = false;
-                }
-    
-                if (selectedCode !== '' && codeCell !== selectedCode) {
-                    displayRow = false;
-                }
-    
-                row.style.display = displayRow ? 'table-row' : 'none';
-
-                if (displayRow) {
-                    hasMatchingRows = true;
-                }
-            });
-
-                // Show or hide the "Nenhum dado encontrado" message row
-                if (hasMatchingRows) {
-                    noDataMessageRow.style.display = 'none';
-                } else {
-                    noDataMessageRow.style.display = 'block';
-                }
-        }
-    
-        document.addEventListener("DOMContentLoaded", function () {
-            var beneficiarySelect = document.getElementById('beneficiarySelect');
-            var codeSelect = document.getElementById('codeSelect');
-    
-            // Populate the Beneficiary and Code selects
-            populateBeneficiarySelect();
-            populateCodeSelect();
-    
-            // Event listeners for both filters
-            beneficiarySelect.addEventListener('change', function () {
-                handleBeneficiaryFilter();
-            });
-    
-            codeSelect.addEventListener('change', function () {
-                handleCodeFilter();
-            });
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-        var beneficiarySelect = document.getElementById('beneficiarySelect');
-        var codeSelect = document.getElementById('codeSelect');
-
-        // Populate the Beneficiary and Code selects
-        populateBeneficiarySelect();
-        populateCodeSelect();
-
-        // Set default value for the code select to "5000510"
-        codeSelect.value = "5000510";
-
-        // Event listeners for both filters
-        beneficiarySelect.addEventListener('change', function () {
-            handleBeneficiaryFilter();
-        });
-
-        codeSelect.addEventListener('change', function () {
-            handleCodeFilter();
-        });
-
-        // Initial filtering to hide the "Nenhum dado encontrado" message row
-        filterTable();
-    });
-    </script> 
-    
-    
-    
-    
-    
-    
-    
+<!-- Include the JavaScript file with the filter script -->
+<script src="../static/js/filtroDadosProducao.js"></script>

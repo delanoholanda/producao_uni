@@ -5,6 +5,7 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Profissional, Beneficiario, Producao, DadosProducao
 import pandas as pd
+from datetime import datetime
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
 from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT
@@ -281,7 +282,10 @@ def todos_dados_producao(producao_id):
     producao = Producao.query.get(producao_id)
     if producao is None:
         return "Production not found."
-    else:        
+    else:
+        # Format the data_hora values in the producao object
+        for dado in producao.dados_producao:
+            dado.formatted_data_hora = dado.data_hora.strftime('%H:%M:%S - %d/%m/%Y')
         return render_template('todos_dados_producao.html', producao=producao)
 
 # # Rotas para CRUD de Producao
