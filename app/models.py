@@ -2,23 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# class Profissional(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     nome = db.Column(db.String(100), nullable=False)
-#     pacientes = db.relationship('Paciente', backref='profissional', lazy=True)
-
-# class Paciente(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     nome = db.Column(db.String(100), nullable=False)
-#     profissional_id = db.Column(db.Integer, db.ForeignKey('profissional.id'), nullable=False)
-
-
 class DadosProducao(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     lote = db.Column(db.String(50), nullable=False)
     data_hora = db.Column(db.DateTime, nullable=False)
     codigo = db.Column(db.String(20), nullable=False)
-    beneficiario = db.Column(db.String(100), nullable=False)
+    beneficiario_id = db.Column(db.Integer, db.ForeignKey('beneficiario.id'), nullable=False)
     qtd_paga = db.Column(db.Integer, nullable=False)
     valor = db.Column(db.Float, nullable=False)
     producao_id = db.Column(db.Integer, db.ForeignKey('producao.id'), nullable=False)
@@ -32,7 +21,8 @@ class Producao(db.Model):
 class Beneficiario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    atendente_1 = db.Column(db.String(100), nullable=False)
+    tipo = db.Column(db.String(100))
+    atendente_1 = db.Column(db.String(100))
     atendente_2 = db.Column(db.String(100))
     atendente_3 = db.Column(db.String(100))
 

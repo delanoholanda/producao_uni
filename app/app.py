@@ -4,7 +4,8 @@ import tempfile
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Profissional, Beneficiario, Producao, DadosProducao
-import pandas as pd
+from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao
+
 from datetime import datetime
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
@@ -72,36 +73,12 @@ def index():
                 # Verificar se a produção já existe com o mesmo valor em producao_movimetacao
                 producao_existente = Producao.query.filter_by(producao_movimetacao=producao_movimetacao).first()
 
+                beneficiarios_AT = obter_beneficiarios_AT()
+
+                criar_beneficiarios_do_dataframe(df, beneficiarios_AT)
+
                 if producao_existente is None:
-                    # Criar a nova produção apenas se não existir
-                    nova_producao = Producao(producao_movimetacao=producao_movimetacao)
-                    db.session.add(nova_producao)
-                    db.session.commit()
-
-                    # Supondo que você tenha um DataFrame "dados" com os dados a serem adicionados à tabela "DadosProducao"
-                    dados = df
-
-                    # Convert 'Qtd.Paga' and 'Valor' columns to numeric types
-                    dados['Qtd.Paga'] = dados['Qtd.Paga'].str.replace(',', '.').astype(float)
-                    dados['Valor'] = dados['Valor'].str.replace(',', '.').astype(float)
-
-                    # Convert 'Data-Hora' to datetime format
-                    dados['Data-Hora'] = pd.to_datetime(dados['Data-Hora'], format='%d/%m/%Y %H:%M:%S')                    
-
-                    for _, row in dados.iterrows():
-                        nova_dados_producao = DadosProducao(
-                            lote=row['Lote'],
-                            data_hora=pd.to_datetime(row['Data-Hora']),
-                            codigo=row['Código'],
-                            beneficiario=row['Beneficiário'],
-                            qtd_paga=row['Qtd.Paga'],
-                            valor=row['Valor'],
-                            producao_id=nova_producao.id  # Associar a linha de dados à produção recém-criada
-                        ) #  Lote,  Data-Hora , Código,  Beneficiario,  Qtd.Paga  e  Valor
-                        db.session.add(nova_dados_producao)
-                    
-                    db.session.commit()
-                
+                    criar_nova_producao(df, producao_movimetacao)                
 
                 DATAFRAME_ORIGINAL = df
 
@@ -110,7 +87,7 @@ def index():
 
                 # df_exibir = filtroAllCodigo(df, lista_diferentes_codigos)
 
-                beneficiarios_AT = obter_beneficiarios_AT()
+                # beneficiarios_AT = obter_beneficiarios_AT()
 
                 codigo = "5000510"
                 df_exibir = filtroByCodigo2(df, codigo, beneficiarios_AT)
