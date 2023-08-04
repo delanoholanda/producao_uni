@@ -1,0 +1,12 @@
+/* Custom CSS for the gray background */
+body {
+    background-color: rgb(233, 229, 229);
+}
+
+/* Custom CSS for the background of the button bar */
+.custom-btn-group {
+    background-color: #f2f2f2;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
