@@ -8,7 +8,7 @@
     <!-- Link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="../static/css/styles.css"> <!-- Seu arquivo de estilos CSS -->
-    <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">    
+    <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">
 </head>
 
 <body>
@@ -36,6 +36,18 @@
                                     <option value="">Todos os Códigos</option>
                                 </select>
                             </div>
+
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn waves-effect waves-light dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                Filtrar por AT
+                            </button>
+                            <ul class="dropdown-menu">
+                                <!-- Add your dropdown menu items here -->
+                                <li><a class="dropdown-item" href="{{ url_for('filtro_at_bd')}}?at=Elizza&&producao={{producao.id}}"
+                                        onclick="updateSelectedAT('Elizza')">Elizza</a></li>
+                            </ul>
                         </div>
                         <table class="mt-3 striped centered table table-bordered table-striped">
                             <thead>
@@ -52,11 +64,19 @@
                                 <tr>
                                     <td>{{ dado.formatted_data_hora }}</td>
                                     <td>{{ dado.codigo }}</td>
-                                    <td>{{ dado.beneficiario }}</td>
+                                    <td>{{ nomes_beneficiarios[dado.beneficiario_id] }}</td>
                                     <td>{{ dado.qtd_paga }}</td>
-                                    <td>{{ dado.valor }}</td>
+                                    <td>{{ dado.formatted_valor }}</td>
                                 </tr>
                                 {% endfor %}
+                                <!-- Linha de Total -->
+                                <tr id="totalRow" style="display: none;">
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>Total</b></td>
+                                    <td id="totalQtdPaga"></td>
+                                    <td id="totalValor"></td>
+                                </tr>
                             </tbody>
                         </table>
                         <div id="noDataMessageRow" style="display: none;">

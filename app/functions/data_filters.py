@@ -1,4 +1,5 @@
 import pandas as pd
+from models import db, Profissional, Beneficiario, Producao, DadosProducao
   
 
 # Define a function to format the values in Brazilian style
@@ -274,13 +275,180 @@ def filtroByAT(dataFrame, beneficiarios_desejados, beneficiarios_especificos, co
         return contagem_ocorrencias
 
 
+def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, profissional, producao):
+
+    print("---------------------------------------------------------------")
+    
+    # Inicialize uma lista para armazenar os IDs correspondentes
+    beneficiarios = []
+
+    # Itere pelos nomes desejados e encontre os IDs correspondentes
+    for nome_desejado in beneficiarios_desejados:
+        beneficiario = Beneficiario.query.filter_by(nome=nome_desejado).first()
+        if beneficiario:
+            beneficiarios.append(beneficiario)
+
+    # Query the database to get DadosProducao records with the specified 'codigo' and 'producao_id'
+    dados_producao_records = DadosProducao.query.filter_by(codigo=codigo).filter_by(producao_id=producao.id).all()
+
+    # Create a dictionary to store beneficiary counts
+    beneficiary_counts = {}
+
+    # Count the occurrences of each beneficiary
+    for record in dados_producao_records:
+        if record.beneficiario_id in beneficiary_counts:
+            beneficiary_counts[record.beneficiario_id] += 1
+        else:
+            beneficiary_counts[record.beneficiario_id] = 1
+    
+    ids_desejados = []
+    # Itere pelos nomes desejados e encontre os IDs correspondentes
+    for nome_desejado in beneficiarios_desejados:
+        beneficiario = Beneficiario.query.filter_by(nome=nome_desejado).first()
+        if beneficiario:
+            ids_desejados.append(beneficiario.id)
+
+    # Filter beneficiaries based on 'beneficiarios_desejados'
+    filtered_beneficiaries = [
+        (beneficiary.nome, beneficiary_counts.get(beneficiary.id, 0))
+        for beneficiary in beneficiarios
+        if beneficiary.id in ids_desejados
+    ]
+
+    # Sort filtered_beneficiaries alphabetically by beneficiary name
+    filtered_beneficiaries.sort(key=lambda x: x[0])
+
+    # # Create the result list with necessary columns
+    # result = []
+    # total_quantity = 0  # Inicialize a variável para a soma das quantidades
+
+    # for beneficiary, count in filtered_beneficiaries:
+    #     result.append({
+    #         'Beneficiário': beneficiary,
+    #         'Quantidade': count,
+    #         'Valor/Atendimento': 50.00,
+    #         'Tipo': 'AT' if beneficiary in beneficiarios_especificos else 'Clinica'
+    #     })
+
+    #     # Adicione a quantidade atual à soma total
+    #     total_quantity += count
+
+    # # Adicione a linha "Total" ao resultado
+    # result.append({
+    #     'Beneficiário': 'Total',
+    #     'Quantidade': total_quantity,
+    #     'Valor/Atendimento': 50.00,
+    #     'Tipo': '--'
+    # })
+
+    # Apply specific logic based on 'profissional'
+    if profissional == "Elizza":
+        for i, (beneficiary, count) in enumerate(filtered_beneficiaries):
+            if beneficiary in ["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ"]:
+                filtered_beneficiaries[i] = (beneficiary, count / 2)
+    elif profissional == "Gabriela":
+        for i, (beneficiary, count) in enumerate(filtered_beneficiaries):
+            if beneficiary in ["ARTHUR MIGUEL C QUEIROZ", "CARLOS HENRIK O BATISTA"]:
+                filtered_beneficiaries[i] = (beneficiary, count / 2)
+
+    # Create the result list with necessary columns
+    result = []
+    total_quantity = 0  # Inicialize a variável para a soma das quantidades
+    total_recebido = 0  # Inicialize a variável para a soma das quantidades
+    total_devido = 0  # Inicialize a variável para a soma das quantidades
+    total_mae = 0  # Inicialize a variável para a soma das quantidades
+    total_parceiro_60 = 0  # Inicialize a variável para a soma das quantidades
+    total_parceiro_40 = 0  # Inicialize a variável para a soma das quantidades
+    total_imposto = 0
+
+    for beneficiary, count in filtered_beneficiaries:
+        # Calcule os valores
+        received = count * 50.00
+        imposto = count * 5.02
+        due = 40 * 50.00 if beneficiary in beneficiarios_especificos else count * 50.00
+        mother_balance = received - due
+        if beneficiary in beneficiarios_especificos:
+            partner_60 = count * 50.00 * 0.5
+            partner_40 = count * 50.00 * 0.4
+        else:
+            partner_60 = count * 50.00 * 0.6
+            partner_40 = count * 50.00 * 0.4       
+        
+
+        result.append({
+            'Beneficiário': beneficiary,
+            'Quantidade': count,
+            'Valor/Atendimento': 50.00,
+            'Tipo': 'AT' if beneficiary in beneficiarios_especificos else 'Clinica',
+            'Recebido': received,
+            'Devido': due,
+            'Saldo Mãe': mother_balance,
+            'Parceiro - 60%': partner_60,
+            'Parceiro - 40%': partner_40,
+            'Imposto Retido': imposto
+        })
+
+        # Adicione a quantidade atual à soma total
+        total_quantity += count
+        total_recebido += received
+        total_devido += due
+        total_mae += mother_balance
+        total_parceiro_60 += partner_60
+        total_parceiro_40 += partner_40
+        total_imposto += imposto
+
+    # Adicione a linha "Total" ao resultado
+    result.append({
+        'Beneficiário': 'Total',
+        'Quantidade': total_quantity,
+        'Valor/Atendimento': 50.00,
+        'Tipo': '',
+        'Recebido': total_recebido,
+        'Devido': total_devido,
+        'Saldo Mãe': total_mae,
+        'Parceiro - 60%': total_parceiro_60,
+        'Parceiro - 40%': total_parceiro_40,
+        'Imposto Retido': total_imposto
+    })
+    
+    # return pd.Series({
+    #     'Recebido': recebido,
+    #     'Devido': devido,
+    #     'Saldo Mãe': mae_faltou,
+    #     'Parceiro - 60%': parceiro_1,
+    #     'Parceiro - 40%': parceiro_2})
+
+    # Print the records
+    for b in result:
+        print(b)
+
+    # # Criar a nova linha
+    # total_row = {
+    #     "Beneficiário": "Total",
+    #     "Quantidade": total_quantas_vezes_passou,
+    #     "Valor/Atendimento": 50.0,
+    #     "Tipo": "",
+    #     "Recebido": total_recebido,
+    #     "Devido": total_devido,
+    #     "Saldo Mãe": total_mae_faltou,
+    #     "Parceiro - 60%": total_parceiro_1,
+    #     "Parceiro - 40%": total_parceiro_2,
+    #     "Imposto Retido": total_retido
+    # }
+    
+
+    print("---------------------------------------------------------------")
+    return result
+
+
+
 def obter_beneficiarios_desejados(profissional):
     if profissional == "Elizza":
         beneficiarios_desejados = [
             "ARTHUR MIGUEL C QUEIROZ", "CAIO ALMEIDA CARNEIRO", "CECILIA PEREIRA MACHADO",
             "ERIC ALMEIDA CARNEIRO", "JOAO GUILHERME S SANTOS", "JOAO LUCAS D QUEIROZ",
             "JOAO MIGUEL PARENTE GOMES", "LUIZ GABRIEL O ALVES", "YAN LUCCA LEMOS GOMES",
-            "CARLOS EDUARDO A OLIVEIRA" ]
+            "CARLOS EDUARDO A OLIVEIRA" , "MARIA LUIZA LOPES MARTINS"]
     elif profissional == "Gabriela":
         beneficiarios_desejados = [
             "ARTHUR DE LIMA VILAR", "ARTHUR MOREIRA CASTRO", "CARLOS HENRIK O BATISTA",
@@ -325,7 +493,8 @@ def obter_beneficiarios_AT():
                                  "CECILIA PEREIRA MACHADO", "DAVI PINHEIRO MATIAS", "EMANUELLY MARCELINO LOPES",
                                  "ERIC DE MEDEIROS CABRAL", "FRANCISCO ARTHUR S LIMA", "JAMILY COSTA SALDANHA",
                                  "JOAO MIGUEL PARENTE GOMES", "JOAO PEDRO G VASCONCELOS", "JOSUE GIRAO PAIXAO",
-                                 "MARIA ISABELLY C SILVA", "MARIA ISABELLY GOMES LIMA", "OSAIAS ALMEIDA CASTRO NT",
-                                 "PEDRO DE ALMEIDA AVELINO", "PEDRO LUCCA H RABELO", "REBECA ALVES FERREIRA"]
+                                 "MARIA ISABELLY C SILVA", "MARIA ISABELLY GOMES LIMA", "MARIA LUIZA LOPES MARTINS",
+                                 "OSAIAS ALMEIDA CASTRO NT", "PEDRO DE ALMEIDA AVELINO", "PEDRO LUCCA H RABELO",
+                                 "REBECA ALVES FERREIRA"]
 
     return beneficiarios_especificos

@@ -35,11 +35,12 @@ function populateCodeSelect() {
     var tableRows = document.querySelectorAll('.table-bordered tbody tr');
     var codes = new Set();
 
-    // Get the unique Codes from the table
-    tableRows.forEach(function (row) {
+    // Get the unique Codes from the table (excluding the last row)
+    for (var i = 0; i < tableRows.length - 1; i++) {
+        var row = tableRows[i];
         var code = row.cells[1].textContent.trim(); // Assuming the Code is in the second column (index 1)
         codes.add(code);
-    });
+    }
 
     // Sort the Codes in ascending order
     var sortedCodes = Array.from(codes).sort();
@@ -89,6 +90,8 @@ function filterTable() {
         }
     });
 
+    // updateTotal();
+
     // Show or hide the "Nenhum dado encontrado" message row
     if (hasMatchingRows) {
         noDataMessageRow.style.display = 'none';
@@ -97,6 +100,36 @@ function filterTable() {
     }
 }
 
+// function updateTotal() {
+//     var totalQtdPaga = 0;
+//     var totalValor = 0;
+
+//     var tableRows = document.querySelectorAll('.table-bordered tbody tr');
+
+//     tableRows.forEach(function (row) {
+//         if (row.style.display !== 'none') {
+//             var qtdPagaCell = row.cells[3];
+//             var valorCell = row.cells[4];
+
+//             totalQtdPaga += parseFloat(qtdPagaCell.textContent);
+//             totalValor += parseFloat(valorCell.textContent.replace('R$ ', '').replace(',', ''));
+//         }
+//     });
+
+//     // Atualiza os valores na linha de Total
+//     var totalQtdPagaCell = document.getElementById('totalQtdPaga');
+//     var totalValorCell = document.getElementById('totalValor');
+
+//     totalQtdPagaCell.textContent = totalQtdPaga.toFixed(0); // Mostra apenas o valor inteiro
+//     totalValorCell.textContent = 'R$ ' + totalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+
+//     // Mostra a linha de Total somente se houver linhas visíveis após o filtro
+//     var totalRow = document.getElementById('totalRow');
+//     totalRow.style.display = (totalQtdPaga > 0 || totalValor > 0) ? 'table-row' : 'none';
+// }
+
+
 document.addEventListener("DOMContentLoaded", function () {
     var beneficiarySelect = document.getElementById('beneficiarySelect');
     var codeSelect = document.getElementById('codeSelect');
@@ -104,6 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Populate the Beneficiary and Code selects
     populateBeneficiarySelect();
     populateCodeSelect();
+
+    // updateTotal();
 
     // Event listeners for both filters
     beneficiarySelect.addEventListener('change', function () {
@@ -122,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Populate the Beneficiary and Code selects
     populateBeneficiarySelect();
     populateCodeSelect();
+    // updateTotal();
 
     // Set default value for the code select to "5000510"
     codeSelect.value = "5000510";

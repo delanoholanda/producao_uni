@@ -10,3 +10,11 @@ body {
     border-radius: 5px;
     margin-bottom: 10px;
 }
+
+#totalQtdPaga {
+    font-weight: bold;
+}
+
+#totalValor {
+    font-weight: bold;
+}

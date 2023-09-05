@@ -5,11 +5,12 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Profissional, Beneficiario, Producao, DadosProducao
 from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao
+import locale
 
 from datetime import datetime
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
-from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT
+from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT, filtroByAtBd
 from functions.create_dataframe import montarDataFrame
 
 
@@ -256,6 +257,9 @@ def show_producoes():
 # Route to display the data for a specific production
 @app.route('/todos_dados_producao/<int:producao_id>')
 def todos_dados_producao(producao_id):
+    # Definir a localização para o Brasil (outra opção seria 'pt_BR.utf8')
+    locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
+    
     producao = Producao.query.get(producao_id)
     if producao is None:
         return "Production not found."
@@ -263,7 +267,73 @@ def todos_dados_producao(producao_id):
         # Format the data_hora values in the producao object
         for dado in producao.dados_producao:
             dado.formatted_data_hora = dado.data_hora.strftime('%H:%M:%S - %d/%m/%Y')
-        return render_template('todos_dados_producao.html', producao=producao)
+
+        # Obter os nomes dos beneficiários correspondentes aos IDs
+        nomes_beneficiarios = {}
+        for dado in producao.dados_producao:
+            beneficiario_id = dado.beneficiario_id
+            beneficiario_nome = Beneficiario.query.get(beneficiario_id).nome
+            nomes_beneficiarios[beneficiario_id] = beneficiario_nome
+        
+       
+        # Formatar os valores monetários
+        for dado in producao.dados_producao:
+             dado.formatted_valor = locale.currency(dado.valor, grouping=True)
+
+
+        return render_template('todos_dados_producao.html', producao=producao, nomes_beneficiarios=nomes_beneficiarios)
+
+@app.route('/filtro-at-bd', methods=['GET'])
+def filtro_at_bd():
+
+    # Defina a localização para o Brasil
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    
+    profissional = request.args.get('at')
+
+    producao_id = request.args.get('producao')
+
+    # Use a função query.get() para buscar a produção com base no ID
+    producao = Producao.query.get(producao_id)
+
+
+    # global DATAFRAME_ORIGINAL
+    # if DATAFRAME_ORIGINAL is None:
+    #     error_message = "Necessário adicionar um PDF"
+    #     return redirect(url_for('index',error_message=error_message), code=302) 
+    
+    beneficiarios_desejados = obter_beneficiarios_desejados(profissional)
+    beneficiarios_AT = obter_beneficiarios_AT()
+
+    codigo = "5000510"
+
+    result = filtroByAtBd(beneficiarios_AT, beneficiarios_desejados, codigo, profissional, producao)
+
+    # Suponha que 'result' é uma lista de dicionários com seus dados
+    for dado in result:
+        # Formate o valor 'Valor/Atendimento' como moeda brasileira
+        dado['Valor/Atendimento'] = locale.currency(dado['Valor/Atendimento'], grouping=True, symbol=None)
+        dado['Recebido'] = locale.currency(dado['Recebido'], grouping=True, symbol=None)
+        dado['Devido'] = locale.currency(dado['Devido'], grouping=True, symbol=None)
+        dado['Saldo Mãe'] = locale.currency(dado['Saldo Mãe'], grouping=True, symbol=None)
+        dado['Parceiro - 60%'] = locale.currency(dado['Parceiro - 60%'], grouping=True, symbol=None)
+        dado['Parceiro - 40%'] = locale.currency(dado['Parceiro - 40%'], grouping=True, symbol=None)
+        dado['Imposto Retido'] = locale.currency(dado['Imposto Retido'], grouping=True, symbol=None)
+
+        
+
+
+    return render_template('filtro_AT_DB.html', dados=result, producao=producao, AT="Produção da " + profissional)
+
+    # # Verificar se o DataFrame filtrado está vazio
+    # if result.empty:
+    #     return render_template('filtro_AT_DB.html', semDados="Você não possui nenhum atendimento na produção: " + PRODUCAO, AT="Produção da " + profissional, producao=PRODUCAO)
+    # else:
+    #     # df_html = df_exibir.to_html(classes='table table-bordered table-striped', index=False)
+    #     # return render_template('filtro_codigo.html', df_html=df_html)
+    #     return render_template('filtro_AT_DB.html', table=result.to_html(classes='table table-bordered table-striped', index=False), AT="Produção da " + profissional, producao=PRODUCAO)
+    #     # return jsonify({'html': df_html})
+
 
 # # Rotas para CRUD de Producao
 # @app.route('/beneficiario', methods=['GET', 'POST'])

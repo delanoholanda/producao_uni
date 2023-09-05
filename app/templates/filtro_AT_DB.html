@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Produções</title>
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Link Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="../static/css/styles.css"> <!-- Seu arquivo de estilos CSS -->
+    <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Lista de produções</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Adicionando o Menu -->
+                        {% include 'menu.html' %}
+                        <!-- Adicionando o Menu -->
+                        <h5 class="text-center">Dados da Produção - {{ producao.producao_movimetacao }}</h5>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn waves-effect waves-light dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                                Filtrar por AT
+                            </button>
+                            <ul class="dropdown-menu">
+                                <!-- Add your dropdown menu items here -->
+                                <li><a class="dropdown-item"
+                                        href="{{ url_for('filtro_at_bd')}}?at=Elizza&&producao={{producao.id}}"
+                                        onclick="updateSelectedAT('Elizza')">Elizza</a>
+                                </li>
+                                <li><a class="dropdown-item"
+                                    href="{{ url_for('filtro_at_bd')}}?at=Gabriela&&producao={{producao.id}}"
+                                    onclick="updateSelectedAT('Gabriela')">Gabriela</a>
+                            </li>
+                            </ul>
+                        </div>
+
+                        <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
+                        <table class="mt-3 striped centered table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Beneficiário</th>
+                                    <th>Qtd.Paga</th>
+                                    <th>Valor/Atendimento</th>
+                                    <th>Tipo</th>
+                                    <th>Recebido</th>
+                                    <th>Devido</th>
+                                    <th>Saldo Mãe</th>
+                                    <th>Parceiro - 60%</th>
+                                    <th>Parceiro - 40%</th>
+                                    <th>Imposto Retido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dado in dados %}
+                                    <td>{{ dado['Beneficiário'] }}</td>
+                                    <td>{{ dado['Quantidade'] }}</td>
+                                    <td>R$ {{ dado['Valor/Atendimento'] }}</td>
+                                    <td>{{ dado['Tipo'] }}</td>
+                                    <td>R$ {{ dado['Recebido'] }}</td>
+                                    <td>R$ {{ dado['Devido'] }}</td>
+                                    <td>R$ {{ dado['Saldo Mãe'] }}</td>
+                                    <td>R$ {{ dado['Parceiro - 60%'] }}</td>
+                                    <td>R$ {{ dado['Parceiro - 40%'] }}</td>
+                                    <td>R$ {{ dado['Imposto Retido'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div id="noDataMessageRow" style="display: none;">
+                            <h6 colspan="5" class="text-center">Nenhum dado encontrado</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    
+    // Obtém a tabela
+    var table = document.querySelector(".mt-3.striped.centered.table.table-bordered.table-striped");
+
+    // Obtém todas as linhas da tabela, exceto o cabeçalho
+    var rows = table.getElementsByTagName("tr");
+
+    // Obtém a última linha (exceto o cabeçalho)
+    var lastRow = rows[rows.length - 1];
+
+    // Aplica o estilo CSS para tornar o texto em negrito
+    lastRow.style.fontWeight = "bold";
+
+    // Começa a partir da segunda linha (índice 1) para evitar o cabeçalho da tabela
+    for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        
+        // Obtém a célula "Saldo Mãe" (índice 6)
+        var saldoMaeCell = row.cells[6];
+        
+        // Obtém o valor da célula "Saldo Mãe" como texto
+        var saldoMaeValue = saldoMaeCell.textContent.trim().replace("R$", "").replace(",", ".");
+
+        // Converte o valor para um número de ponto flutuante
+        var saldoMaeFloat = parseFloat(saldoMaeValue);
+
+        // Aplica estilos com base no valor
+        if (saldoMaeFloat > 0) {
+            saldoMaeCell.style.color = "green"; // Pinta de verde para valores positivos
+            saldoMaeCell.style.fontWeight = "bold";
+        } else if (saldoMaeFloat < 0) {
+            saldoMaeCell.style.color = "red"; // Pinta de vermelho para valores negativos
+            saldoMaeCell.style.fontWeight = "bold";
+        }
+    }
+
+</script>
+
+<!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Link Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
