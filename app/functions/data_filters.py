@@ -344,8 +344,13 @@ def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, pro
     # Apply specific logic based on 'profissional'
     if profissional == "Elizza":
         for i, (beneficiary, count) in enumerate(filtered_beneficiaries):
-            if beneficiary in ["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ"]:
-                filtered_beneficiaries[i] = (beneficiary, count / 2)
+            if beneficiary in ["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ", "YAN LUCCA LEMOS GOMES"]:
+                if beneficiary == "ARTHUR MIGUEL C QUEIROZ":
+                    filtered_beneficiaries[i] = (beneficiary, (count / 2) + 1)
+                elif beneficiary == "YAN LUCCA LEMOS GOMES":
+                    filtered_beneficiaries[i] = (beneficiary, 14)
+                else:
+                    filtered_beneficiaries[i] = (beneficiary, count / 2) 
     elif profissional == "Gabriela":
         for i, (beneficiary, count) in enumerate(filtered_beneficiaries):
             if beneficiary in ["ARTHUR MIGUEL C QUEIROZ", "CARLOS HENRIK O BATISTA"]:
@@ -368,8 +373,15 @@ def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, pro
         due = 40 * 50.00 if beneficiary in beneficiarios_especificos else count * 50.00
         mother_balance = received - due
         if beneficiary in beneficiarios_especificos:
-            partner_60 = count * 50.00 * 0.5
-            partner_40 = count * 50.00 * 0.4
+            if (count * 50.00) > 2000:
+                partner_60 = 1000
+                partner_40 = received - partner_60
+            elif (count * 50.00) < 2000:
+                partner_40 = 1000
+                partner_60 = received - partner_40
+            elif(count * 50.00) == 2000:
+                partner_40 = 1000
+                partner_60 = 1000            
         else:
             partner_60 = count * 50.00 * 0.6
             partner_40 = count * 50.00 * 0.4       
