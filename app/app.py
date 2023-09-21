@@ -220,6 +220,10 @@ def beneficiario():
         db.session.commit()
     beneficiarios = Beneficiario.query.all()
     profissionais = Profissional.query.all()
+
+    # Consulta todos os beneficiários e ordena pelo campo 'nome' em ordem crescente
+    beneficiarios = Beneficiario.query.order_by(Beneficiario.nome).all()
+    
     return render_template('beneficiario.html', beneficiarios=beneficiarios, profissionais=profissionais)
 
 @app.route('/beneficiario/delete/<int:id>')

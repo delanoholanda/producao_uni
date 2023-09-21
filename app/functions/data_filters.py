@@ -277,7 +277,7 @@ def filtroByAT(dataFrame, beneficiarios_desejados, beneficiarios_especificos, co
 
 def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, profissional, producao):
 
-    print("---------------------------------------------------------------")
+    # print("---------------------------------------------------------------")
     
     # Inicialize uma lista para armazenar os IDs correspondentes
     beneficiarios = []
@@ -431,8 +431,8 @@ def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, pro
     #     'Parceiro - 40%': parceiro_2})
 
     # Print the records
-    for b in result:
-        print(b)
+    # for b in result:
+        # print(b)
 
     # # Criar a nova linha
     # total_row = {
