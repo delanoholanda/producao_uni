@@ -177,7 +177,7 @@ def all_dados():
 
 
 # Rotas para CRUD de Profissional
-@app.route('/profissional', methods=['GET', 'POST'])
+@app.route('/profissionais/profissional', methods=['GET', 'POST'])
 def profissional():
     if request.method == 'POST':
         nome = request.form['nome']
@@ -185,9 +185,15 @@ def profissional():
         db.session.add(novo_profissional)
         db.session.commit()
     profissionais = Profissional.query.all()
-    return render_template('profissional.html', profissionais=profissionais)
 
-@app.route('/profissional/delete/<int:id>')
+    # Adicione esta linha para obter a lista de beneficiários para cada profissional
+    beneficiarios_por_profissional = {profissional: profissional.beneficiarios_relacionados() for profissional in profissionais}
+    
+    return render_template('/profissionais/profissional.html', profissionais=profissionais, beneficiarios_por_profissional=beneficiarios_por_profissional)
+
+    # return render_template('profissional.html', profissionais=profissionais)
+
+@app.route('/profissionais/profissional/delete/<int:id>')
 def delete_profissional(id):
     profissional = Profissional.query.get_or_404(id)
     db.session.delete(profissional)
@@ -196,13 +202,13 @@ def delete_profissional(id):
 
 
 # Rota para renderizar o formulário de edição do Profissional
-@app.route('/profissional/edit/<int:id>', methods=['GET'])
+@app.route('/profissionais/profissional/edit/<int:id>', methods=['GET'])
 def edit_profissional(id):
     profissional = Profissional.query.get_or_404(id)
-    return render_template('edit_profissional.html', profissional=profissional)
+    return render_template('/profissionais/edit_profissional.html', profissional=profissional)
 
 # Rota para processar a submissão do formulário de edição do Profissional
-@app.route('/profissional/edit/<int:id>', methods=['POST'])
+@app.route('/profissionais/profissional/edit/<int:id>', methods=['POST'])
 def update_profissional(id):
     profissional = Profissional.query.get_or_404(id)
     profissional.nome = request.form['nome']
@@ -212,7 +218,7 @@ def update_profissional(id):
 
 
 # Rotas para CRUD de Beneficiario
-@app.route('/beneficiario', methods=['GET', 'POST'])
+@app.route('/beneficiarios/beneficiario', methods=['GET', 'POST'])
 def beneficiario():
     if request.method == 'POST':
         nome = request.form['nome']
@@ -226,9 +232,9 @@ def beneficiario():
     # Consulta todos os beneficiários e ordena pelo campo 'nome' em ordem crescente
     beneficiarios = Beneficiario.query.order_by(Beneficiario.nome).all()
     
-    return render_template('beneficiario.html', beneficiarios=beneficiarios, profissionais=profissionais)
+    return render_template('/beneficiarios/beneficiario.html', beneficiarios=beneficiarios, profissionais=profissionais)
 
-@app.route('/beneficiario/delete/<int:id>')
+@app.route('/beneficiarios/beneficiario/delete/<int:id>')
 def delete_beneficiario(id):
     beneficiario = Beneficiario.query.get_or_404(id)
     db.session.delete(beneficiario)
@@ -237,26 +243,17 @@ def delete_beneficiario(id):
 
 
 # Rota para renderizar o formulário de edição do Beneficiario
-@app.route('/beneficiario/edit/<int:id>', methods=['GET'])
+@app.route('/beneficiarios/beneficiario/edit/<int:id>', methods=['GET'])
 def edit_beneficiario(id):
     beneficiario = Beneficiario.query.get_or_404(id)
     profissionais = Profissional.query.all()
-    return render_template('edit_beneficiario.html', beneficiario=beneficiario, profissionais=profissionais)
-
-# Rota para processar a submissão do formulário de edição do Beneficiario
-# @app.route('/beneficiario/edit/<int:id>', methods=['POST'])
-# def update_beneficiario(id):
-#     beneficiario = Beneficiario.query.get_or_404(id)
-#     beneficiario.nome = request.form['nome']
-#     beneficiario.profissional_id = request.form['profissional_id']
-#     db.session.commit()
-#     return redirect(url_for('beneficiario'))
+    return render_template('/beneficiarios/edit_beneficiario.html', beneficiario=beneficiario, profissionais=profissionais)
 
 
-@app.route('/beneficiario/edit/<int:id>', methods=['POST'])
+@app.route('/beneficiarios/beneficiario/edit/<int:id>', methods=['POST'])
 def update_beneficiario(id):
     beneficiario = Beneficiario.query.get_or_404(id)
-    beneficiario.nome = request.form['nome']
+    # beneficiario.nome = request.form['nome']
     beneficiario.tipo = request.form['tipo']  # Atualize o campo 'tipo'
     
     # Obtenha os IDs dos novos atendentes do formulário
@@ -277,6 +274,38 @@ def update_beneficiario(id):
     db.session.commit()
     return redirect(url_for('beneficiario'))
 
+
+# Rota para renderizar o formulário de edição do Beneficiario
+@app.route('/beneficiarios/beneficiario/show/<int:id>', methods=['GET'])
+def show_beneficiario(id):
+    beneficiario = Beneficiario.query.get_or_404(id)
+    profissionais = Profissional.query.all()
+    return render_template('/beneficiarios/show_beneficiario.html', beneficiario=beneficiario, profissionais=profissionais)
+
+
+@app.route('/beneficiarios/beneficiario/show/<int:id>', methods=['POST'])
+def update_show_beneficiario(id):
+    beneficiario = Beneficiario.query.get_or_404(id)
+    # beneficiario.nome = request.form['nome']
+    beneficiario.tipo = request.form['tipo']  # Atualize o campo 'tipo'
+    
+    # Obtenha os IDs dos novos atendentes do formulário
+    atendente_1_id = int(request.form['atendente_1']) if request.form['atendente_1'] else None
+    atendente_2_id = int(request.form['atendente_2']) if request.form['atendente_2'] else None
+    atendente_3_id = int(request.form['atendente_3']) if request.form['atendente_3'] else None
+
+    # Obtenha os objetos Profissional correspondentes aos atendentes do formulário
+    atendente_1 = Profissional.query.get(atendente_1_id) if atendente_1_id else None
+    atendente_2 = Profissional.query.get(atendente_2_id) if atendente_2_id else None
+    atendente_3 = Profissional.query.get(atendente_3_id) if atendente_3_id else None
+
+    # Atribua os atendentes ao Beneficiario
+    beneficiario.atendente_1 = atendente_1
+    beneficiario.atendente_2 = atendente_2
+    beneficiario.atendente_3 = atendente_3
+
+    db.session.commit()
+    return redirect(url_for('beneficiario'))
 
 # Route to display the existing productions in the HTML template
 @app.route('/show_producoes')

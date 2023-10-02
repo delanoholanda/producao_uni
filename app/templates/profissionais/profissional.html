@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profissionais</title>
+    <!-- Link Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Link Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">
+    <link rel="stylesheet" href="../static/css/styles.css"> <!-- Seu arquivo de estilos CSS -->
+    <!-- <style>
+        /* Custom CSS for the gray background */
+        body {
+            background-color: rgb(233, 229, 229);
+        }
+
+        /* Custom CSS for the background of the button bar */
+        .custom-btn-group {
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style> -->
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Produção Unimed - {{producao}}</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Adicionando o Menu -->
+                        {% include 'menu.html' %}
+                        <!-- Adicionando o Menu -->
+                        <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
+                        <div class="container">
+                            <h5>Adicionar Profissional</h5>
+                            <div class="row">
+                                <form class="col s12" method="post">
+                                    <div class="row">
+                                        <div class="input-field col s8">
+                                            <input type="text" name="nome" id="nome" placeholder="Nome" required>
+                                            <label for="nome">Nome</label>
+                                        </div>
+                                        <div class="col s4">
+                                            <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <table class="striped centered table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Profissional</th>
+                                        <!-- <th>Beneficiários</th> -->
+                                        <th>Opções</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for profissional in profissionais %}
+                                    <tr>
+                                        <td>{{ profissional.nome }}</td>
+                                        <!-- <td>
+                                            <ul>
+                                                {% for beneficiario in beneficiarios_por_profissional[profissional] %}
+                                                    <li>{{ beneficiario.nome }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td> -->
+                                        <td>
+                                            <a href="#" class="btn-small waves-effect waves-light green detalhes-btn" data-nome="{{ profissional.nome }}" data-beneficiarios="{% for beneficiario in beneficiarios_por_profissional[profissional] %}{{ beneficiario.nome }},{% endfor %}">
+                                                <i class="material-icons">Detalhes</i>
+                                            </a>
+                                            <a href="{{ url_for('edit_profissional', id=profissional.id) }}" class="btn-small waves-effect waves-light blue">
+                                                <i class="material-icons">Editar</i>
+                                            </a>
+                                            <a href="{{ url_for('delete_profissional', id=profissional.id) }}" class="btn-small waves-effect waves-light red">
+                                                <i class="material-icons">Apagar</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="modal-detalhes" class="modal">
+                            <div class="modal-content">
+                                <h4>Detalhes do Profissional</h4>
+                                <p><strong>Nome: </strong><span id="detalhes-nome"></span></p>
+                                <p><strong>Quantidade de Beneficiários: </strong><span id="detalhes-quantidade-beneficiarios"></span></p>
+                                <table class="striped centered table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Beneficiários</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detalhes-beneficiarios">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Fechar</a>
+                            </div>
+                        </div>
+                        
+                        
+                        <!-- <p class="text-center">{{ semDados }}</p> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Link Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.querySelector('#modal-detalhes');
+            const detalhesBtns = document.querySelectorAll('.detalhes-btn');
+            const detalhesNome = document.querySelector('#detalhes-nome');
+            const detalhesQuantidadeBeneficiarios = document.querySelector('#detalhes-quantidade-beneficiarios');
+            const detalhesBeneficiarios = document.querySelector('#detalhes-beneficiarios');
+    
+            detalhesBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const nome = this.getAttribute('data-nome');
+                    const beneficiarios = this.getAttribute('data-beneficiarios').split(',').filter(Boolean);
+                    const quantidadeBeneficiarios = beneficiarios.length;
+    
+                    detalhesNome.textContent = nome;
+                    detalhesQuantidadeBeneficiarios.textContent = quantidadeBeneficiarios;
+                    detalhesBeneficiarios.innerHTML = ''; // Limpa o conteúdo anterior da tabela
+    
+                    if (quantidadeBeneficiarios === 0) {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        cell.textContent = 'Nenhum encontrado';
+                        row.appendChild(cell);
+                        detalhesBeneficiarios.appendChild(row);
+                    } else {
+                        beneficiarios.forEach(beneficiario => {
+                            const row = document.createElement('tr');
+                            const cell = document.createElement('td');
+                            cell.textContent = beneficiario;
+                            row.appendChild(cell);
+                            detalhesBeneficiarios.appendChild(row);
+                        });
+                    }
+    
+                    const instance = M.Modal.getInstance(modal);
+                    instance.open();
+                });
+            });
+    
+            M.Modal.init(modal, {
+                dismissible: true,
+            });
+        });
+    </script>
+    
+    
+    
+    
