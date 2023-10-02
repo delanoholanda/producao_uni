@@ -1,29 +1,15 @@
-
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Beneficiarios</title>
+    <title>Profissionais</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <!-- Link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">
     <link rel="stylesheet" href="../static/css/styles.css"> <!-- Seu arquivo de estilos CSS -->
-    <!-- <style>
-        /* Custom CSS for the gray background */
-        body {
-            background-color: rgb(233, 229, 229);
-        }
 
-        /* Custom CSS for the background of the button bar */
-        .custom-btn-group {
-            background-color: #f2f2f2;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-    </style> -->
 </head>
 <body>
     <div class="container">
@@ -39,19 +25,19 @@
                         <!-- Adicionando o Menu -->
                         <h5 id="selectedAT" style="padding-block-end: inherit; text-align: center; font-weight: bold;">{{ AT }}</h5>
                         <div class="container">
-                            <h1>Editar Beneficiario</h1>
+                            <h5>Editar Profissional</h5>
                             <form method="post">
                                 <label for="nome">Nome:</label>
-                                <input type="text" name="nome" id="nome" value="{{ beneficiario.nome }}" required>
-                                <label for="profissional_id">Profissional:</label>
-                                <select name="profissional_id" id="profissional_id">
-                                    {% for profissional in profissionais %}
-                                    <option value="{{ profissional.id }}" {% if profissional.id == beneficiario.profissional_id %}selected{% endif %}>{{ profissional.nome }}</option>
-                                    {% endfor %}
-                                </select>
-                                <button type="submit">Salvar</button>
+                                <input type="text" name="nome" id="nome" value="{{ profissional.nome }}" required>
+                                
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-submit btn waves-effect blue waves-light"
+                                        style="width: 150px;">Salvar</button>
+                                    <a href="{{ url_for('profissional') }}" class="btn btn waves-effect red waves-light"
+                                        style="width: 150px;">Cancelar</a>
+                                </div>
+                                <!-- <button type="submit">Salvar</button> -->
                             </form>
-                            <a href="{{ url_for('beneficiario') }}">Cancelar</a>
                             
                         </div>
                         
@@ -64,19 +50,8 @@
             </div>
         </div>
     </div>
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <!-- Link Bootstrap JS (optional, only required for some Bootstrap components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Link Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        // Inicializar o elemento select do Materialize
-        $(document).ready(function(){
-            $('select').formSelect();
-        });
-    </script>
-
-</body>
-</html>

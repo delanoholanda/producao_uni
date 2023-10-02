@@ -1,7 +1,23 @@
-from models import db, Beneficiario, Producao, DadosProducao
+from models import db, Beneficiario, Producao, DadosProducao, Profissional
 import pandas as pd
 
+
+# Lista de nomes de profissionais
+nomes_profissionais = [
+    "Alice", "Darlene", "Davylla", "Elizza", "Gabriela",
+    "Geane", "Ivana", "Jaqueline", "Jayanne", "Joana",
+    "Jô", "Mariana", "Mariane", "Olinea", "Quintina",
+    "Simone", "Thalia", "Wytalla"
+]
+
+# Caso altere o nome da Darlene na lista acima, precisa lembrar de alterar também no método abaixo criar_beneficiarios_do_dataframe
+
 def criar_beneficiarios_do_dataframe(df, beneficiarios_AT):
+    
+    atendente1 = Profissional.query.filter_by(nome="Darlene")
+
+    primeiro_atendente = atendente1.first()
+
     for index, row in df.iterrows():
         nome = row['Beneficiário']
 
@@ -13,8 +29,8 @@ def criar_beneficiarios_do_dataframe(df, beneficiarios_AT):
             if nome in beneficiarios_AT:
                 tipo = "AT"
             else:
-                tipo = "Clinica"
-            novo_beneficiario = Beneficiario(nome=nome, tipo=tipo)
+                tipo = "Clínica"
+            novo_beneficiario = Beneficiario(nome=nome, tipo=tipo, atendente_1_id=primeiro_atendente.id)
             db.session.add(novo_beneficiario)
         
         # novo_beneficiario = Beneficiario(nome=nome)
@@ -85,4 +101,14 @@ def criar_nova_producao(df, producao_movimetacao):
         )
         db.session.add(nova_dados_producao)
 
+    db.session.commit()
+
+
+
+def adicionar_profissionais():
+    for nome in nomes_profissionais:
+        profissional_existente = Profissional.query.filter_by(nome=nome).first()
+        if not profissional_existente:
+            profissional = Profissional(nome=nome)
+            db.session.add(profissional)
     db.session.commit()

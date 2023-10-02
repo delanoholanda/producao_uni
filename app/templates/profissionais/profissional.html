@@ -56,6 +56,7 @@
                                 <thead>
                                     <tr>
                                         <th>Profissional</th>
+                                        <!-- <th>Beneficiários</th> -->
                                         <th>Opções</th>
                                     </tr>
                                 </thead>
@@ -63,7 +64,17 @@
                                     {% for profissional in profissionais %}
                                     <tr>
                                         <td>{{ profissional.nome }}</td>
+                                        <!-- <td>
+                                            <ul>
+                                                {% for beneficiario in beneficiarios_por_profissional[profissional] %}
+                                                    <li>{{ beneficiario.nome }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td> -->
                                         <td>
+                                            <a href="#" class="btn-small waves-effect waves-light green detalhes-btn" data-nome="{{ profissional.nome }}" data-beneficiarios="{% for beneficiario in beneficiarios_por_profissional[profissional] %}{{ beneficiario.nome }},{% endfor %}">
+                                                <i class="material-icons">Detalhes</i>
+                                            </a>
                                             <a href="{{ url_for('edit_profissional', id=profissional.id) }}" class="btn-small waves-effect waves-light blue">
                                                 <i class="material-icons">Editar</i>
                                             </a>
@@ -76,6 +87,26 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div id="modal-detalhes" class="modal">
+                            <div class="modal-content">
+                                <h4>Detalhes do Profissional</h4>
+                                <p><strong>Nome: </strong><span id="detalhes-nome"></span></p>
+                                <p><strong>Quantidade de Beneficiários: </strong><span id="detalhes-quantidade-beneficiarios"></span></p>
+                                <table class="striped centered table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Beneficiários</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detalhes-beneficiarios">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Fechar</a>
+                            </div>
+                        </div>
+                        
                         
                         <!-- <p class="text-center">{{ semDados }}</p> -->
                     </div>
@@ -88,3 +119,52 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Link Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.querySelector('#modal-detalhes');
+            const detalhesBtns = document.querySelectorAll('.detalhes-btn');
+            const detalhesNome = document.querySelector('#detalhes-nome');
+            const detalhesQuantidadeBeneficiarios = document.querySelector('#detalhes-quantidade-beneficiarios');
+            const detalhesBeneficiarios = document.querySelector('#detalhes-beneficiarios');
+    
+            detalhesBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const nome = this.getAttribute('data-nome');
+                    const beneficiarios = this.getAttribute('data-beneficiarios').split(',').filter(Boolean);
+                    const quantidadeBeneficiarios = beneficiarios.length;
+    
+                    detalhesNome.textContent = nome;
+                    detalhesQuantidadeBeneficiarios.textContent = quantidadeBeneficiarios;
+                    detalhesBeneficiarios.innerHTML = ''; // Limpa o conteúdo anterior da tabela
+    
+                    if (quantidadeBeneficiarios === 0) {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        cell.textContent = 'Nenhum encontrado';
+                        row.appendChild(cell);
+                        detalhesBeneficiarios.appendChild(row);
+                    } else {
+                        beneficiarios.forEach(beneficiario => {
+                            const row = document.createElement('tr');
+                            const cell = document.createElement('td');
+                            cell.textContent = beneficiario;
+                            row.appendChild(cell);
+                            detalhesBeneficiarios.appendChild(row);
+                        });
+                    }
+    
+                    const instance = M.Modal.getInstance(modal);
+                    instance.open();
+                });
+            });
+    
+            M.Modal.init(modal, {
+                dismissible: true,
+            });
+        });
+    </script>
+    
+    
+    
+    
