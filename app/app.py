@@ -4,10 +4,9 @@ import tempfile
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Profissional, Beneficiario, Producao, DadosProducao
-from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao
+from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao, adicionar_profissionais
 import locale
 
-from datetime import datetime
 
 from functions.process_pdf import extrairTextoPdf,  tratarTextoExtraido
 from functions.data_filters import buscaLotesCodigos, filtroAllCodigo, filtroByCodigo, filtroByCodigo2, filtroByAT, obter_beneficiarios_desejados, obter_beneficiarios_AT, filtroByAtBd
@@ -35,6 +34,7 @@ db.init_app(app)
 # Cria o banco de dados
 with app.app_context():
     db.create_all()
+    adicionar_profissionais()
 
 
 DATAFRAME_ORIGINAL = None
@@ -79,7 +79,9 @@ def index():
                 criar_beneficiarios_do_dataframe(df, beneficiarios_AT)
 
                 if producao_existente is None:
-                    criar_nova_producao(df, producao_movimetacao)                
+                    criar_nova_producao(df, producao_movimetacao)
+
+                            
 
                 DATAFRAME_ORIGINAL = df
 
@@ -242,11 +244,36 @@ def edit_beneficiario(id):
     return render_template('edit_beneficiario.html', beneficiario=beneficiario, profissionais=profissionais)
 
 # Rota para processar a submissão do formulário de edição do Beneficiario
+# @app.route('/beneficiario/edit/<int:id>', methods=['POST'])
+# def update_beneficiario(id):
+#     beneficiario = Beneficiario.query.get_or_404(id)
+#     beneficiario.nome = request.form['nome']
+#     beneficiario.profissional_id = request.form['profissional_id']
+#     db.session.commit()
+#     return redirect(url_for('beneficiario'))
+
+
 @app.route('/beneficiario/edit/<int:id>', methods=['POST'])
 def update_beneficiario(id):
     beneficiario = Beneficiario.query.get_or_404(id)
     beneficiario.nome = request.form['nome']
-    beneficiario.profissional_id = request.form['profissional_id']
+    beneficiario.tipo = request.form['tipo']  # Atualize o campo 'tipo'
+    
+    # Obtenha os IDs dos novos atendentes do formulário
+    atendente_1_id = int(request.form['atendente_1']) if request.form['atendente_1'] else None
+    atendente_2_id = int(request.form['atendente_2']) if request.form['atendente_2'] else None
+    atendente_3_id = int(request.form['atendente_3']) if request.form['atendente_3'] else None
+
+    # Obtenha os objetos Profissional correspondentes aos atendentes do formulário
+    atendente_1 = Profissional.query.get(atendente_1_id) if atendente_1_id else None
+    atendente_2 = Profissional.query.get(atendente_2_id) if atendente_2_id else None
+    atendente_3 = Profissional.query.get(atendente_3_id) if atendente_3_id else None
+
+    # Atribua os atendentes ao Beneficiario
+    beneficiario.atendente_1 = atendente_1
+    beneficiario.atendente_2 = atendente_2
+    beneficiario.atendente_3 = atendente_3
+
     db.session.commit()
     return redirect(url_for('beneficiario'))
 

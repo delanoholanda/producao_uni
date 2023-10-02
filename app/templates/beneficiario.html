@@ -64,7 +64,8 @@
                                 <thead>
                                     <tr>
                                         <th>Beneficiário</th>
-                                        <!-- <th>Profissional que Atende</th> -->
+                                        <th>Tipo</th>
+                                        <th>Profissional que Atende</th>
                                         <th>Opções</th>
                                     </tr>
                                 </thead>
@@ -72,6 +73,14 @@
                                     {% for beneficiario in beneficiarios %}
                                     <tr>
                                         <td>{{ beneficiario.nome }}</td>
+                                        <td>{{ beneficiario.tipo }}</td>
+                                        <td>
+                                            <ul>
+                                                <li>Atendente 1: {{ beneficiario.atendente_1.nome if beneficiario.atendente_1 else 'Nenhum' }}</li>
+                                                <li> {{ "Atendente 2: " + beneficiario.atendente_2.nome if beneficiario.atendente_2 else '' }}</li>
+                                                <li> {{ "Atendente 3: " + beneficiario.atendente_3.nome if beneficiario.atendente_3 else '' }}</li>
+                                            </ul>
+                                        </td>
                                         <td>
                                             <a href="{{ url_for('edit_beneficiario', id=beneficiario.id) }}" class="btn-small waves-effect waves-light blue">
                                                 <i class="material-icons">Editar</i>
