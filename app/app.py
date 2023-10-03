@@ -4,7 +4,7 @@ import tempfile
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Profissional, Beneficiario, Producao, DadosProducao
-from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao, adicionar_profissionais
+from functions.dao import criar_beneficiarios_do_dataframe, criar_nova_producao, adicionar_profissionais, criar_resumo_producao
 import locale
 
 
@@ -80,6 +80,7 @@ def index():
 
                 if producao_existente is None:
                     criar_nova_producao(df, producao_movimetacao)
+                    criar_resumo_producao()
 
                             
 

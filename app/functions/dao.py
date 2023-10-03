@@ -1,4 +1,4 @@
-from models import db, Beneficiario, Producao, DadosProducao, Profissional
+from models import db, Beneficiario, Producao, DadosProducao, Profissional, ResumoProducao
 import pandas as pd
 
 
@@ -112,3 +112,28 @@ def adicionar_profissionais():
             profissional = Profissional(nome=nome)
             db.session.add(profissional)
     db.session.commit()
+
+# Função para criar a nova tabela a partir dos dados existentes
+def criar_resumo_producao():
+    # Consulta para obter os dados da tabela DadosProducao onde o código seja igual a '500510'
+    dados = DadosProducao.query.filter_by(codigo='5000510').all()
+
+    # Dicionário para armazenar os dados agregados por beneficiario_id e producao_id
+    dados_agregados = {}
+
+    # Loop pelos dados e agregação
+    for dado in dados:
+        chave = (dado.beneficiario_id, dado.producao_id)
+        if chave not in dados_agregados:
+            dados_agregados[chave] = 0
+        dados_agregados[chave] += dado.qtd_paga
+
+    # Inserir os dados agregados na nova tabela
+    for chave, qtd_total in dados_agregados.items():
+        beneficiario_id, producao_id = chave
+        nova_linha = ResumoProducao(beneficiario_id=beneficiario_id, qtd_total=qtd_total, producao_id=producao_id)
+        db.session.add(nova_linha)
+
+    # Commit das alterações
+    db.session.commit()
+

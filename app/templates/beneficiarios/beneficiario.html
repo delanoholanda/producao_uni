@@ -6,6 +6,7 @@
     <title>Pacientes</title>
     <!-- Link Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Link Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="icon" type="image/png" href="../static/images/unimed-logo.png" sizes="32x32">
@@ -60,6 +61,9 @@
                                     <button class="btn waves-effect waves-light" type="submit">Adicionar</button>
                                 </form> -->
                             </div>
+                            <div class="text-center">
+                                <h5>Lista de Beneficiários</h5>
+                            </div>
                             <table class="striped centered table table-bordered table-striped">
                                 <thead>
                                     <tr>
@@ -82,11 +86,11 @@
                                             </ul>
                                         </td>
                                         <td>
-                                            <a href="{{ url_for('show_beneficiario', id=beneficiario.id) }}" class="btn-small waves-effect waves-light green">
-                                                <i class="material-icons">Detalhes</i>
+                                            <a href="{{ url_for('show_beneficiario', id=beneficiario.id) }}" title="Ver Detalhes" class="btn-small waves-effect waves-light green">
+                                                <i class="material-icons">assignment</i>
                                             </a>
-                                            <a href="{{ url_for('edit_beneficiario', id=beneficiario.id) }}" class="btn-small waves-effect waves-light blue">
-                                                <i class="material-icons">Editar</i>
+                                            <a href="{{ url_for('edit_beneficiario', id=beneficiario.id) }}" title="Editar Beneficiário" class="btn-small waves-effect waves-light blue">
+                                                <i class="material-icons">create</i>
                                             </a>
                                             <!-- <a href="{{ url_for('delete_beneficiario', id=beneficiario.id) }}" class="btn-small waves-effect waves-light red">
                                                 <i class="material-icons">Apagar</i>

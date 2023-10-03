@@ -45,3 +45,30 @@ class Profissional(db.Model):
 
     # beneficiarios = db.relationship('Beneficiario', secondary=beneficiario_profissional, back_populates='atendentes')
 
+# Crie uma nova classe de modelo para representar a nova tabela
+class ResumoProducao(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    beneficiario_id = db.Column(db.Integer, nullable=False)
+    qtd_total = db.Column(db.Integer, nullable=False)
+    producao_id = db.Column(db.Integer, nullable=False)
+
+# class TabelaResultadoProducao(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     beneficiario = db.Column(db.String(100), nullable=False)
+#     qtd_paga = db.Column(db.Integer, nullable=False)
+#     valor_atendimento = db.Column(db.Float, nullable=False)
+#     tipo = db.Column(db.String(100), nullable=False)
+#     atendente_1_id = db.Column(db.Integer, db.ForeignKey('profissional.id'))
+#     atendente_2_id = db.Column(db.Integer, db.ForeignKey('profissional.id'))
+#     atendente_3_id = db.Column(db.Integer, db.ForeignKey('profissional.id'))
+#     producao_id = db.Column(db.Integer, db.ForeignKey('producao.id'))
+
+#     atendente_1 = db.relationship('Profissional', foreign_keys=[atendente_1_id], backref='beneficiario_atendente_1')
+#     atendente_2 = db.relationship('Profissional', foreign_keys=[atendente_2_id], backref='beneficiario_atendente_2')
+#     atendente_3 = db.relationship('Profissional', foreign_keys=[atendente_3_id], backref='beneficiario_atendente_3')
+
+
+
+
+
+

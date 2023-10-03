@@ -344,11 +344,11 @@ def filtroByAtBd(beneficiarios_especificos, beneficiarios_desejados, codigo, pro
     # Apply specific logic based on 'profissional'
     if profissional == "Elizza":
         for i, (beneficiary, count) in enumerate(filtered_beneficiaries):
-            if beneficiary in ["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO", "ARTHUR MIGUEL C QUEIROZ", "YAN LUCCA LEMOS GOMES"]:
+            if beneficiary in ["CAIO ALMEIDA CARNEIRO", "ERIC ALMEIDA CARNEIRO"]:
                 if beneficiary == "ARTHUR MIGUEL C QUEIROZ":
                     filtered_beneficiaries[i] = (beneficiary, (count / 2) + 1)
-                elif beneficiary == "YAN LUCCA LEMOS GOMES":
-                    filtered_beneficiaries[i] = (beneficiary, 14)
+                # elif beneficiary == "YAN LUCCA LEMOS GOMES":
+                    # filtered_beneficiaries[i] = (beneficiary, 14)
                 else:
                     filtered_beneficiaries[i] = (beneficiary, count / 2) 
     elif profissional == "Gabriela":
@@ -507,6 +507,7 @@ def obter_beneficiarios_AT():
                                  "JOAO MIGUEL PARENTE GOMES", "JOAO PEDRO G VASCONCELOS", "JOSUE GIRAO PAIXAO",
                                  "MARIA ISABELLY C SILVA", "MARIA ISABELLY GOMES LIMA", "MARIA LUIZA LOPES MARTINS",
                                  "OSAIAS ALMEIDA CASTRO NT", "PEDRO DE ALMEIDA AVELINO", "PEDRO LUCCA H RABELO",
-                                 "REBECA ALVES FERREIRA"]
+                                 "REBECA ALVES FERREIRA", "YAN LUCCA LEMOS GOMES", "ARTHUR MIGUEL C QUEIROZ",
+                                 "LUIZ GABRIEL O ALVES"]
 
     return beneficiarios_especificos
